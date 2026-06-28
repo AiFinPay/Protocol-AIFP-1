@@ -1,0 +1,22 @@
+name: OpenAPI
+
+on:
+  pull_request:
+    paths:
+      - "docs/aifp/08-OpenAPI-3.1-Specification.yaml"
+      - ".github/workflows/openapi.yml"
+  workflow_dispatch:
+
+jobs:
+  validate:
+    name: Validate OpenAPI contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check OpenAPI file exists
+        run: test -f docs/aifp/08-OpenAPI-3.1-Specification.yaml
+      - name: Validate with Redocly when available
+        run: |
+          if command -v npx >/dev/null 2>&1; then
+            npx --yes @redocly/cli lint docs/aifp/08-OpenAPI-3.1-Specification.yaml || exit 1
+          fi
