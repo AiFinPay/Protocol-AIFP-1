@@ -1,0 +1,29 @@
+name: Docs
+
+on:
+  pull_request:
+    paths:
+      - "README.md"
+      - "docs/**"
+      - "examples/**"
+      - "sdk/**"
+      - "schemas/**"
+      - "assets/**"
+      - ".github/workflows/docs.yml"
+  push:
+    branches: [main]
+
+jobs:
+  markdown:
+    name: Markdown structure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check required repository files
+        run: |
+          test -f README.md
+          test -f ROADMAP.md
+          test -f CONTRIBUTING.md
+          test -f SECURITY.md
+          test -f docs/index.md
+          test -f docs/aifp/README.md
