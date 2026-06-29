@@ -1,8 +1,4 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/brand/aifinpay-paywall-mark.svg">
-    <img alt="AiFinPay Paywall" src="assets/brand/aifinpay-paywall-mark.svg" width="96">
-  </picture>
 </p>
 
 <h1 align="center">AiFinPay Paywall Protocol</h1>
