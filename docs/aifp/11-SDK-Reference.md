@@ -24,6 +24,16 @@
 + jitter, base 200ms, cap 30s). **Idempotency-Key** is auto-generated for `pay()` unless
 supplied.
 
+## Pricing model
+
+| Tier | Starts From | Typical Action |
+|---|---:|---|
+| `standard` | `$0.00001` | Simple read, single record, lightweight API request |
+| `complex` | `$0.00006` | Search, aggregation, multi-source queries, higher compute |
+| `premium` | `$0.00010` | AI inference, GPU workloads, deep analytics, premium data |
+
+AiFinPay applies a **1% protocol fee** to every successful transaction. The remaining **99%** is settled to the merchant, excluding applicable payment network or settlement costs.
+
 ---
 
 ## 1. TypeScript / Node — `@aifinpay/agent`, `@aifinpay/merchant`
@@ -46,7 +56,7 @@ const res = await agent.get("https://merchant.example.com/api/data");
 console.log(res.data, res.aifp.receiptId);
 
 // Explicit steps
-const quote   = await agent.quote({ merchantId: "mrch_9f3a1c2b", resource: "/api/data", complexity: "standard" });
+const quote   = await agent.quote({ merchantId: "mrch_9f3a1c2b", resource: "/api/data", pricingTier: "standard" });
 const receipt = await agent.pay({ quoteId: quote.quoteId, walletId: "wlt_3a1b", asset: "USDC", chain: "polygon" });
 
 // Budget policy (throws BudgetExceededError -> AIFP-403-BUDGET-EXCEEDED)
@@ -55,7 +65,7 @@ await agent.setBudget({ window: "day", capUsd: "50.00" });
 
 ### Interfaces
 ```ts
-interface QuoteRequest { merchantId: string; resource: string; complexity?: "simple"|"standard"|"complex"|"premium"; currency?: "USD"; }
+interface QuoteRequest { merchantId: string; resource: string; pricingTier?: "standard"|"complex"|"premium"; currency?: "USD"; }
 interface PayRequest   { quoteId: string; walletId: string; asset: "USDC"|"USDT"|"PYUSD"; chain: Chain; idempotencyKey?: string; }
 interface Receipt      { receiptId: string; receipt: string; status: "settled"|"settling"|"expired"|"revoked"; txRef?: string; amount: string; fee?: string; expiresAt: string; }
 ```
@@ -95,7 +105,7 @@ resp = agent.get("https://merchant.example.com/api/data")
 print(resp.json(), resp.aifp.receipt_id)
 
 # Explicit
-quote = agent.quote(merchant_id="mrch_9f3a1c2b", resource="/api/data", complexity="standard")
+quote = agent.quote(merchant_id="mrch_9f3a1c2b", resource="/api/data", pricing_tier="standard")
 receipt = agent.pay(quote_id=quote.quote_id, wallet_id="wlt_3a1b", asset="USDC", chain="polygon")
 
 agent.set_budget(window="day", cap_usd="50.00")  # raises BudgetExceeded later
@@ -133,7 +143,7 @@ ag := aifp.NewAgent(aifp.Config{APIKey: os.Getenv("AIFP_KEY"), WalletID: "wlt_3a
 res, err := ag.Get(ctx, "https://merchant.example.com/api/data")
 
 // Explicit
-q, _ := ag.Quote(ctx, aifp.QuoteRequest{MerchantID: "mrch_9f3a1c2b", Resource: "/api/data", Complexity: aifp.Standard})
+q, _ := ag.Quote(ctx, aifp.QuoteRequest{MerchantID: "mrch_9f3a1c2b", Resource: "/api/data", PricingTier: aifp.Standard})
 r, _ := ag.Pay(ctx, aifp.PayRequest{QuoteID: q.QuoteID, WalletID: "wlt_3a1b", Asset: aifp.USDC, Chain: aifp.Polygon})
 
 // Merchant verify (no network call)
@@ -151,12 +161,12 @@ claims, err := v.Verify(jwt, aifp.VerifyOpts{Resource: "/api/data"})
 **Install:** `cargo add aifinpay`
 
 ```rust
-use aifinpay::{Agent, QuoteRequest, PayRequest, Asset, Chain, Complexity};
+use aifinpay::{Agent, QuoteRequest, PayRequest, Asset, Chain, PricingTier};
 
 let agent = Agent::new("sk_live_...").wallet("wlt_3a1b");
 let res = agent.get("https://merchant.example.com/api/data").await?;
 
-let q = agent.quote(QuoteRequest{ merchant_id:"mrch_9f3a1c2b".into(), resource:"/api/data".into(), complexity:Complexity::Standard, ..Default::default() }).await?;
+let q = agent.quote(QuoteRequest{ merchant_id:"mrch_9f3a1c2b".into(), resource:"/api/data".into(), pricing_tier:PricingTier::Standard, ..Default::default() }).await?;
 let r = agent.pay(PayRequest{ quote_id:q.quote_id, wallet_id:"wlt_3a1b".into(), asset:Asset::Usdc, chain:Chain::Polygon }).await?;
 
 // Verify
@@ -178,7 +188,7 @@ Agent agent = Agent.builder().apiKey(System.getenv("AIFP_KEY")).walletId("wlt_3a
 PayThroughResponse res = agent.get("https://merchant.example.com/api/data");
 
 Quote q = agent.quote(QuoteRequest.builder()
-    .merchantId("mrch_9f3a1c2b").resource("/api/data").complexity(Complexity.STANDARD).build());
+    .merchantId("mrch_9f3a1c2b").resource("/api/data").pricingTier(PricingTier.STANDARD).build());
 Receipt r = agent.pay(PayRequest.builder()
     .quoteId(q.getQuoteId()).walletId("wlt_3a1b").asset(Asset.USDC).chain(Chain.POLYGON).build());
 
@@ -201,7 +211,7 @@ use AiFinPay\Agent; use AiFinPay\MerchantVerifier;
 $agent = new Agent(['apiKey' => getenv('AIFP_KEY'), 'walletId' => 'wlt_3a1b']);
 $res = $agent->get('https://merchant.example.com/api/data');
 
-$quote   = $agent->quote(['merchantId' => 'mrch_9f3a1c2b', 'resource' => '/api/data', 'complexity' => 'standard']);
+$quote   = $agent->quote(['merchantId' => 'mrch_9f3a1c2b', 'resource' => '/api/data', 'pricingTier' => 'standard']);
 $receipt = $agent->pay(['quoteId' => $quote->quoteId, 'walletId' => 'wlt_3a1b', 'asset' => 'USDC', 'chain' => 'polygon']);
 
 $verifier = new MerchantVerifier('mrch_9f3a1c2b');
@@ -221,7 +231,7 @@ PSR-3 logging supported.
 var agent = new Agent(new AgentOptions { ApiKey = Env("AIFP_KEY"), WalletId = "wlt_3a1b" });
 var res = await agent.GetAsync("https://merchant.example.com/api/data");
 
-var quote   = await agent.QuoteAsync(new QuoteRequest { MerchantId = "mrch_9f3a1c2b", Resource = "/api/data", Complexity = Complexity.Standard });
+var quote   = await agent.QuoteAsync(new QuoteRequest { MerchantId = "mrch_9f3a1c2b", Resource = "/api/data", PricingTier = PricingTier.Standard });
 var receipt = await agent.PayAsync(new PayRequest { QuoteId = quote.QuoteId, WalletId = "wlt_3a1b", Asset = Asset.USDC, Chain = Chain.Polygon });
 
 var verifier = new MerchantVerifier("mrch_9f3a1c2b");
@@ -235,13 +245,9 @@ var (valid, claims) = await verifier.VerifyAsync(jwt, resource: "/api/data");
 
 ## Cross-language guarantees
 
-1. **Identical pricing & enums** — complexity tiers, assets (USDC/USDT/PYUSD), and the
-   12-chain set are the same everywhere (Doc 10 enums).
-2. **Stateless verify** — every `Verifier` performs the AIFP-1 §7.4 10-step check with no
-   network call; only JWKS is cached.
-3. **Idempotency** — `pay()` auto-attaches an `Idempotency-Key` (24h window) unless
-   overridden.
-4. **Retries** — exponential backoff with jitter (base 200ms, cap 30s, 5 attempts);
-   `402`/`409` are never blindly retried.
-5. **Errors** — every SDK exposes the canonical `AIFP-*` code; new codes (e.g.
-   `AIFP-403-BUDGET-EXCEEDED`) surface uniformly.
+1. **Identical pricing & enums** — action pricing tiers (Standard from $0.00001, Complex from $0.00006, Premium from $0.00010), assets (USDC/USDT/PYUSD), and the 12-chain set are the same everywhere.
+2. **Protocol fee** — every SDK surfaces the 1% AiFinPay protocol fee and merchant net settlement amount where available.
+3. **Stateless verify** — every `Verifier` performs the AIFP-1 §7.4 10-step check with no network call; only JWKS is cached.
+4. **Idempotency** — `pay()` auto-attaches an `Idempotency-Key` (24h window) unless overridden.
+5. **Retries** — exponential backoff with jitter (base 200ms, cap 30s, 5 attempts); `402`/`409` are never blindly retried.
+6. **Errors** — every SDK exposes the canonical `AIFP-*` code; new codes (e.g. `AIFP-403-BUDGET-EXCEEDED`) surface uniformly.
