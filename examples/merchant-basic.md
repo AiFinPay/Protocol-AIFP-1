@@ -10,9 +10,8 @@ const app = express();
 
 app.use(aifpPaywall({
   merchantId: "mrch_9f3a1c2b",
-  freeQuota: 100,
   pricing: {
-    "/api/data": { complexity: "standard" }
+    "/api/data": { tier: "standard" }
   }
 }));
 
@@ -25,7 +24,8 @@ app.listen(3000);
 
 Expected behavior:
 
-1. Requests within free quota return `200`.
-2. Requests after quota return `402 Payment Required`.
-3. Requests retried with a valid receipt return `200`.
-4. Invalid, expired, or replayed receipts are rejected.
+1. Paid actions return `402 Payment Required` when no valid receipt is present.
+2. The agent quotes the Standard tier, starting from `$0.00001`.
+3. The agent pays, AiFinPay applies a 1% protocol fee, and 99% settles to the merchant excluding network or settlement costs.
+4. Requests retried with a valid receipt return `200`.
+5. Invalid, expired, or replayed receipts are rejected.
