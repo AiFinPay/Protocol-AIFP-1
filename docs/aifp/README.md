@@ -22,6 +22,16 @@ The official documentation ecosystem for the **AiFinPay Paywall Protocol (AIFP)*
 | 14 | [Ecosystem & Governance](./14-Ecosystem-and-Governance.md) | Partners, foundations | Open-standard strategy, governance, certification |
 | 15 | [Repository Architecture](./15-Repository-Architecture.md) | Maintainers | GitHub org layout, CI/CD, templates, contribution flow |
 
+## Pricing Summary
+
+| Agent Action Tier | Starts From | Typical Action |
+|---|---:|---|
+| Standard | `$0.00001` | Simple read, single record, lightweight API request |
+| Complex | `$0.00006` | Search, aggregation, multi-source queries, higher compute |
+| Premium | `$0.00010` | AI inference, GPU workloads, deep analytics, premium data |
+
+AiFinPay charges a **1% protocol fee** on every successful transaction. The remaining **99%** is settled to the merchant, excluding any applicable payment network or settlement costs.
+
 ## How They Fit Together
 
 - **Document 01 governs.** It is the normative spec. All other documents are conforming guidance; on any conflict, AIFP-1 wins.
