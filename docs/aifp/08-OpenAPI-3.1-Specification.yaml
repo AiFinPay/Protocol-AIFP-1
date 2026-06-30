@@ -4,9 +4,30 @@ info:
   version: 1.0.0
   description: >-
     Canonical source path reserved for the full OpenAPI 3.1 specification from the attached documentation package.
+    Current pricing model: Standard from $0.00001, Complex from $0.00006, Premium from $0.00010.
+    AiFinPay charges a 1% protocol fee on every successful transaction; the remaining 99% is settled to the merchant,
+    excluding applicable payment network or settlement costs.
 servers:
   - url: https://api.aifinpay.io/v1
   - url: https://sandbox.api.aifinpay.io/v1
 paths: {}
 components:
-  schemas: {}
+  schemas:
+    PricingTier:
+      type: string
+      enum: [standard, complex, premium]
+      description: Agent action pricing tier.
+    PricingRule:
+      type: object
+      properties:
+        tier:
+          $ref: '#/components/schemas/PricingTier'
+        starts_from_usd:
+          type: string
+          enum: ['0.00001', '0.00006', '0.00010']
+        protocol_fee_percent:
+          type: number
+          const: 1
+        merchant_settlement_percent:
+          type: number
+          const: 99
