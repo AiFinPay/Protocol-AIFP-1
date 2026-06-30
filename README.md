@@ -27,15 +27,15 @@ AI agents increasingly fetch data, call APIs, read content, and execute workflow
 
 | Old Web Model | Why It Breaks For Agents | AIFP Replacement |
 |---|---|---|
-| Ads | Agents do not view or click ads | Per-request machine payments |
+| Ads | Agents do not view or click ads | Per-action machine payments |
 | Subscriptions | Agents cannot subscribe to every source they touch | Stateless receipts scoped to a resource |
 | Manual API keys | Too slow for dynamic discovery | `402` challenge and automatic payment |
-| Card checkout | Transaction fees exceed request value | Stablecoin and fiat micropayments |
+| Card checkout | Transaction fees exceed machine-action value | Micropayments with stablecoin and fiat settlement |
 | Bot blocking | Negative-sum for providers and builders | Monetize machine traffic |
 
 AIFP makes payment a native application-layer primitive for the AI web.
 
-> **Canonical rule:** the attached AIFP documents are the source of truth. This repository organizes, indexes, tests, and publishes those documents without changing their protocol meaning.
+> **Canonical pricing update:** agent actions are priced as Standard, Complex, and Premium tiers starting at $0.00001. AiFinPay charges a 1% protocol fee on successful transactions; 99% settles to the merchant, excluding applicable network or settlement costs.
 
 ---
 
@@ -155,8 +155,7 @@ AIFP separates the **control plane** from the **data plane**. The control plane 
 ```mermaid
 stateDiagram-v2
     [*] --> Request
-    Request --> FreeAccess: quota available
-    Request --> Challenge: quota exhausted
+    Request --> Challenge: paid action required
     Challenge --> Quote: agent supports AIFP
     Challenge --> Onboarding402: agent does not support AIFP
     Quote --> Pay
@@ -165,7 +164,6 @@ stateDiagram-v2
     Retry --> VerifyReceipt
     VerifyReceipt --> AccessGranted: valid signature + scope
     VerifyReceipt --> Rejected: expired / replay / mismatch
-    FreeAccess --> [*]
     AccessGranted --> [*]
     Rejected --> [*]
 ```
@@ -180,8 +178,8 @@ stateDiagram-v2
     "quote_endpoint": "https://api.aifinpay.io/v1/quote",
     "merchant_id": "mrch_9f3a1c2b",
     "resource": "/api/data",
-    "complexity": "standard",
-    "estimated_amount": "0.04",
+    "pricing_tier": "standard",
+    "estimated_amount": "0.00001",
     "currency": "USD",
     "accepted_assets": ["USDC", "USDT", "PYUSD"],
     "accepted_chains": ["polygon", "base", "solana"],
@@ -201,7 +199,7 @@ Every receipt is verified locally by the merchant:
 | Issuer | Must be trusted AiFinPay receipt authority |
 | Audience | Must match merchant id |
 | Resource | Must match the retried resource |
-| Amount | Must meet or exceed required price |
+| Amount | Must meet or exceed required action price |
 | Expiry | Default TTL is 600 seconds |
 | Nonce | Must be single-use, replay rejected with `409` |
 
@@ -209,21 +207,21 @@ Every receipt is verified locally by the merchant:
 
 ## Pricing Model
 
-| Tier | Price | Typical Resource |
+| Agent Action Tier | Starts From | Typical Action |
 |---|---:|---|
-| `simple` | `$0.01` | cacheable reads, low-cost lookups |
-| `standard` | `$0.04` | typical API call or single record |
-| `complex` | `$0.08` | search, aggregation, multi-record result |
-| `premium` | `$0.10` | inference, premium data, heavy compute |
+| `standard` | `$0.00001` | Simple read, single record, lightweight API request |
+| `complex` | `$0.00006` | Search, aggregation, multi-source queries, higher compute |
+| `premium` | `$0.00010` | AI inference, GPU workloads, deep analytics, premium data |
 
-Additional invariants:
+### Pricing Rules
 
-| Invariant | Value |
+| Rule | Value |
 |---|---|
-| Free quota | 100 requests per agent / merchant / month |
-| Protocol fee | 0.3% / 0.6% / 0.9%, capped near 1% |
+| Protocol fee | AiFinPay charges **1%** of every successful transaction |
+| Merchant settlement | The remaining **99%** is settled to the merchant |
+| Settlement costs | Payment network, gas, processor, or settlement costs may apply separately |
 | Idempotency | `Idempotency-Key`, 24 hour dedupe window |
-| x402 migration | 1,000 free requests |
+| x402 migration | 1,000 free migration requests |
 | Assets | USDC, USDT, PYUSD |
 | Networks | Solana, Polygon, Avalanche, BNB Chain, Optimism, Arbitrum, Base, Unichain, BOT Chain, XRPL EVM, NEAR, Aptos |
 | Native token | None |
@@ -244,9 +242,8 @@ import { aifpPaywall } from "@aifinpay/merchant";
 app.use(aifpPaywall({
   merchantId: "mrch_...",
   pricing: {
-    "/api/data": { complexity: "standard" }
-  },
-  freeQuota: 100
+    "/api/data": { tier: "standard" }
+  }
 }));
 ```
 
@@ -274,7 +271,7 @@ const response = await agent.fetch("https://merchant.example.com/api/data");
 curl https://api.aifinpay.io/v1/quote \
   -H "Authorization: Bearer $AIFP_AGENT_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"merchant_id":"mrch_9f3a1c2b","resource":"/api/data","complexity":"standard"}'
+  -d '{"merchant_id":"mrch_9f3a1c2b","resource":"/api/data","pricing_tier":"standard"}'
 ```
 
 ---
