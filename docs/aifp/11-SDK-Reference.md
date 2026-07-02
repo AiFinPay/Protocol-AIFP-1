@@ -114,7 +114,7 @@ agent.set_budget(window="day", cap_usd="50.00")  # raises BudgetExceeded later
 ```python
 # Async variant
 from aifinpay_agent.aio import AsyncAgent
-async with AsyncAgent(api_key="sk_live_...") as a:
+async with AsyncAgent(api_key="sk_live_...") as a:  # pragma: allowlist secret
     r = await a.get(url)
 ```
 

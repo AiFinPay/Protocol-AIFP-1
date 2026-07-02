@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-import sys, os, subprocess, markdown, html
+import html
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+
+import markdown
 
 CSS = """
 @page { size: A4; margin: 22mm 18mm; }
@@ -34,15 +41,19 @@ def convert(md_path, pdf_path):
     text = open(md_path, encoding="utf-8").read()
     body = markdown.markdown(text, extensions=["tables","fenced_code","toc","sane_lists","attr_list"])
     full = f"<!doctype html><html><head><meta charset='utf-8'><style>{CSS}</style></head><body>{body}</body></html>"
-    htmlf = pdf_path.replace(".pdf", ".tmp.html")
-    open(htmlf, "w", encoding="utf-8").write(full)
-    subprocess.run([
-        "google-chrome","--headless","--no-sandbox","--disable-gpu",
-        f"--print-to-pdf={pdf_path}","--no-pdf-header-footer",
-        "--run-all-compositor-stages-before-draw","--virtual-time-budget=10000",
-        f"file://{os.path.abspath(htmlf)}"
-    ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    os.remove(htmlf)
+    workdir = tempfile.mkdtemp(prefix="md2pdf_")
+    try:
+        htmlf = os.path.join(workdir, "input.tmp.html")
+        open(htmlf, "w", encoding="utf-8").write(full)
+        subprocess.run([
+            "google-chrome","--headless","--no-sandbox","--disable-gpu",
+            f"--user-data-dir={workdir}",
+            f"--print-to-pdf={os.path.abspath(pdf_path)}","--no-pdf-header-footer",
+            "--run-all-compositor-stages-before-draw","--virtual-time-budget=10000",
+            f"file://{os.path.abspath(htmlf)}"
+        ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    finally:
+        shutil.rmtree(workdir, ignore_errors=True)
     print("PDF:", pdf_path)
 
 if __name__ == "__main__":
