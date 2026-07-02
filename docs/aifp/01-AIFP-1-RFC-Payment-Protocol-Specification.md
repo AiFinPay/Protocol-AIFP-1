@@ -2,8 +2,8 @@
 
 **Document:** AIFP-1
 **Title:** AiFinPay Payment Protocol Specification
-**Category:** Standards Track
-**Status:** Draft Standard
+**Category:** Open Protocol Specification
+**Status:** Open Protocol Specification
 **Version:** 1.0.0
 **Date:** June 28, 2026
 **Authors:** AiFinPay Protocol Team
@@ -14,7 +14,7 @@
 >
 > 1. **AIFP-1 — Payment Protocol Specification** *(this document — the normative standard)*
 > 2. [Merchant Integration Guide](./02-Merchant-Integration-Guide.md) — server-side integration for 15 frameworks
-> 3. [AI Agent SDK Specification](./03-AI-Agent-SDK-Specification.md) — client-side agent SDK across 7 languages
+> 3. [AI Agent SDK Specification](./03-AI-Agent-SDK-Specification.md) — client-side agent SDK (Python `aifinpay-agent`, Node `@aifinpay/agent`, MCP `@aifinpay/mcp`; other languages planned)
 > 4. [Security & Cryptography Specification](./04-Security-and-Cryptography-Specification.md) — threat model & crypto
 >
 > This document is **self-contained**. It defines the protocol normatively. The other three documents are *implementation guidance* that conform to this specification. Where this document and another disagree, **this document governs**.
@@ -23,9 +23,9 @@
 
 ## Status of This Memo
 
-This document specifies the AiFinPay Payment Protocol, version 1 (**AIFP-1**), an application-layer payment protocol layered on top of HTTP. It is published for the AiFinPay developer community, protocol implementers, enterprises, standards bodies, and investors. Distribution is unlimited.
+This document specifies the AiFinPay Payment Protocol, version 1 (**AIFP-1**). AIFP is an open payment protocol that enables AI agents to natively pay for websites, APIs, data, compute, and digital services, while enabling providers to monetize AI traffic instead of blocking it. HTTP 402 compatibility is one of its interoperability features. It is published for the AiFinPay developer community, protocol implementers, enterprises, and investors. Distribution is unlimited.
 
-AIFP-1 is a **Draft Standard**. It is stable enough for production implementation and is in active use, but normative details MAY be refined through the Open Governance process (Section 22) prior to promotion to **Internet Standard**. Implementers SHOULD track the protocol changelog (Appendix D) and the `AIFP-Version` negotiation mechanism (Section 8.3).
+AIFP-1 is an **Open Protocol Specification**. It is stable enough for production implementation and is in active use, but normative details MAY be refined through the Open Governance process (Section 22). Implementers SHOULD track the protocol changelog (Appendix D) and the `AIFP-Version` negotiation mechanism (Section 8.3).
 
 This memo does not represent the position of any standards-development organization. It is an open specification; implementations MAY compete.
 
@@ -33,9 +33,9 @@ This memo does not represent the position of any standards-development organizat
 
 ## Copyright Notice
 
-Copyright © 2026 AiFinPay, Inc. and the persons identified as authors. All rights reserved.
+Copyright © 2026 CoinSecurities (SECCO) Pte. Ltd., Singapore and the persons identified as authors. All rights reserved.
 
-This document is licensed under **CC BY 4.0**. Reference implementations referenced herein are licensed separately (Apache-2.0 / MIT). The "AiFinPay" name and logo are trademarks of AiFinPay, Inc. The protocol itself is open; you may implement it without permission.
+This document is licensed under **CC BY 4.0**. Reference implementations referenced herein are licensed separately (Apache-2.0 / MIT). The "AiFinPay" name and logo are trademarks of CoinSecurities (SECCO) Pte. Ltd., Singapore The protocol itself is open; you may implement it without permission.
 
 ---
 
@@ -130,7 +130,7 @@ No registration, no subscriptions, no human in the loop — completed in a singl
 
 ## 1.4. The machine economy
 
-AIFP lays rails for a **Machine-to-Machine (M2M) economy** in which agents own wallets and budgets, execute millions of micro-transactions, carry **identity and reputation** (Agent Passport), and use **delegated** and **streaming** payments. AIFP is to payments what TLS became to security and OAuth to authorization: it makes **payment a native part of HTTP semantics** for the machine web, finally activating the `402 Payment Required` status code that HTTP/1.1 reserved for exactly this purpose.
+AIFP lays rails for a **Machine-to-Machine (M2M) economy** in which agents own wallets and budgets, execute millions of micro-transactions, carry **identity** (Agent Passport), and use **delegated** and **streaming** payments. AIFP is to payments what TLS became to security and OAuth to authorization: it makes **payment a native part of HTTP semantics** for the machine web, finally activating the `402 Payment Required` status code that HTTP/1.1 reserved for exactly this purpose.
 
 ---
 
@@ -155,13 +155,13 @@ An AIFP-1 implementation is designed against eight principles. These are normati
 
 - **Agent.** An autonomous software client (LLM agent, crawler, pipeline) that consumes resources and pays for them.
 - **Merchant.** A provider of a paid resource (API or content) that integrates AIFP to monetize machine traffic.
-- **Wallet.** A funding source bound to an agent: an on-chain wallet (custodial, non-custodial, or MPC) or a fiat balance.
+- **Wallet.** A funding source bound to an agent: a non-custodial on-chain wallet (the agent holds its keys and signs locally) or a fiat balance.
 - **Quote.** A server-issued, time-bounded price for accessing a specific resource at a specific pricing_tier.
 - **Payment Challenge.** The machine-readable `402` payload telling an agent how and how much to pay.
 - **Receipt Token.** A signed, time-bounded cryptographic proof of payment that grants access on retry.
 - **Nonce.** A single-use value embedded in a challenge and receipt to prevent replay.
 - **Free Quota.** The number of requests a merchant serves free before charging (default 100).
-- **Pricing Tier Tier.** A merchant-assigned cost class for a resource: *standard / standard / complex / premium*.
+- **Pricing tier.** A merchant-assigned cost class for a resource: *standard / complex / premium*.
 - **Settlement.** The act of moving value to the merchant on-chain or via fiat rails.
 - **Stateless Verification.** Local receipt validation by signature, exp, nonce, and amount, with no backend call.
 - **Control Plane / Data Plane.** AiFinPay backend (quoting, payment, receipts) vs. merchant middleware (interception, verification).
@@ -231,7 +231,7 @@ HTTP/1.1 ([RFC 9110]) reserves **`402 Payment Required`** "for future use." AIFP
 
 ## 6.1. Purpose
 
-The Payment Challenge is the machine-readable instruction set an agent needs to pay: *where* to get a quote, *what* resource, *which* pricing_tier tier, *how much* (estimate), *which* assets and chains are accepted, a single-use **nonce**, and an **expiry**.
+The Payment Challenge is the machine-readable instruction set an agent needs to pay: *where* to get a quote, *what* resource, *which* pricing_tier, *how much* (estimate), *which* assets and chains are accepted, a single-use **nonce**, and an **expiry**.
 
 ## 6.2. Variant A — header form (x402-compatible)
 
@@ -261,7 +261,7 @@ Content-Type: application/json
     "pricing_tier": "standard",
     "estimated_amount": "0.04",
     "currency": "USD",
-    "accepted_assets": ["USDC", "USDT", "PYUSD"],
+    "accepted_assets": ["USDC", "USDT", "SOL", "POL"],
     "accepted_chains": ["polygon", "base", "solana", "unichain"],
     "nonce": "b7e2...c91a",
     "expires_at": "2026-06-28T12:34:56Z"
@@ -278,10 +278,10 @@ Content-Type: application/json
 | `quote_endpoint` | MUST | Where the agent requests a binding quote |
 | `merchant_id` | MUST | Stable merchant identifier `mrch_*` |
 | `resource` | MUST | The protected path/resource |
-| `pricing_tier` | MUST | `standard` \| `standard` \| `complex` \| `premium` |
+| `pricing_tier` | MUST | `standard` \| `complex` \| `premium` |
 | `estimated_amount` | SHOULD | Decimal string, USD-denominated estimate |
 | `currency` | SHOULD | ISO-4217, default `"USD"` |
-| `accepted_assets` | SHOULD | Stablecoins accepted, e.g. `USDC`, `USDT`, `PYUSD` |
+| `accepted_assets` | SHOULD | Assets accepted, e.g. `USDC`, `USDT`, `SOL`, `POL` (`PYUSD` planned) |
 | `accepted_chains` | SHOULD | Networks accepted (Appendix B) |
 | `nonce` | MUST | Single-use, ≥128 bits entropy |
 | `expires_at` | MUST | RFC 3339 timestamp |
@@ -290,8 +290,7 @@ Content-Type: application/json
 
 | Pricing Tier | Price (USD) | Typical use |
 |---|---|---|
-| `standard` | **USD 0.00001** | Cheap reads, key-value lookups |
-| `standard` | **USD 0.00001** | Typical API call, single record |
+| `standard` | **USD 0.00001** | Cheap reads, key-value lookups, typical API call, single record |
 | `complex` | **USD 0.00006** | Aggregations, search, multi-record |
 | `premium` | **USD 0.00010** | Inference, heavy compute, premium data |
 
@@ -386,7 +385,7 @@ A receipt is **single-use** by default (nonce consumed on redemption). Merchants
 
 ```
 Production:  https://api.aifinpay.io/v1
-Sandbox:     https://sandbox.api.aifinpay.io/v1
+Sandbox:     https://sandbox.api.aifinpay.io/v1   (planned)
 ```
 
 ## 8.2. Request headers
@@ -504,7 +503,7 @@ AIFP distinguishes **identity** (who you are) from **payment** (proof you paid):
 
 ## 10.2. Agent identity
 
-An agent is identified by `AIFP-Agent-ID` and, optionally, an **Agent Passport** (a signed identity credential, `agt_*` / `pp_*`, Ed25519). The Passport binds an agent to its wallets, budget policies, and reputation. Full Passport semantics are defined in the [AI Agent SDK Specification](./03-AI-Agent-SDK-Specification.md#agent-passport) and the [Security Specification](./04-Security-and-Cryptography-Specification.md). For AIFP-1, a Passport is OPTIONAL: an agent MAY pay anonymously with only a funded wallet.
+An agent is identified by `AIFP-Agent-ID` and, optionally, an **Agent Passport** (a signed identity credential, `agt_*` / `pp_*`, Ed25519). The Passport binds an agent to its wallets and budget policies. Full Passport semantics are defined in the [AI Agent SDK Specification](./03-AI-Agent-SDK-Specification.md#agent-passport) and the [Security Specification](./04-Security-and-Cryptography-Specification.md). For AIFP-1, a Passport is OPTIONAL: an agent MAY pay anonymously with only a funded wallet.
 
 ## 10.3. Authorization rules
 
@@ -563,14 +562,13 @@ An AIFP agent: sends a request; on `402`, parses the challenge, gets a quote, pa
 
 | Type | Custody | Use |
 |---|---|---|
-| **Custodial** | AiFinPay-held | Fastest onboarding; AiFinPay signs |
 | **Non-custodial** | Agent-held key | Agent controls keys; signs locally |
-| **MPC** | Threshold-shared | No single key; enterprise-grade |
-| **Fiat balance** | AiFinPay ledger | Prepaid USD balance, fiat/stablecoin settlement |
+| **MPC** *(planned)* | Threshold-shared | No single key; enterprise-grade |
+| **Fiat balance** | Prepaid ledger balance | Prepaid USD balance, fiat/stablecoin settlement |
 
 ## 13.2. Funding and budgets
 
-A wallet is funded on-chain (stablecoin deposit) or via fiat top-up. Each wallet carries a **budget policy**: per-request cap, daily/monthly caps, per-merchant allowances, and an optional auto-refill. The protocol error `AIFP-403-BUDGET-EXCEEDED` is returned when a payment would breach a budget policy. Wallet binding to an Agent Passport, multi-wallet routing, and MPC operation are specified in Documents 3 and 4.
+A wallet is funded on-chain (stablecoin deposit) or via fiat top-up. Each wallet carries a **budget policy**: per-request cap, daily/monthly caps, per-merchant allowances, and an optional auto-refill. The protocol error `AIFP-403-BUDGET-EXCEEDED` is returned when a payment would breach a budget policy. Wallet binding to an Agent Passport, multi-wallet routing, and MPC operation (planned) are specified in Documents 3 and 4.
 
 ---
 
@@ -611,7 +609,7 @@ A `402` MUST NOT be a dead end. When an agent does **not** advertise AIFP suppor
     "estimated_amount": "0.04", "currency": "USD", "nonce": "b7e2...c91a", "expires_at": "2026-06-28T12:34:56Z" },
   "agent_supported": false,
   "onboarding": {
-    "what_is_aifinpay": "AiFinPay is an application-layer payment protocol on top of HTTP that lets AI agents automatically pay for access to content and APIs without human involvement.",
+    "what_is_aifinpay": "AiFinPay is an open payment protocol that enables AI agents to natively pay for websites, APIs, data, compute, and digital services, while enabling providers to monetize AI traffic instead of blocking it. HTTP 402 compatibility is one of its interoperability features.",
     "why_payment_required": "The free quota (100 requests) is exhausted. Further access to this resource is paid.",
     "actions": {
       "connect_wallet": "https://app.aifinpay.io/wallet/connect",
@@ -646,7 +644,7 @@ When the agent **does** advertise support (`Accept-Payment: aifp/1.0`), the merc
   "resource": "/api/data",
   "amount": "0.04",
   "currency": "USD",
-  "accepted_assets": ["USDC", "USDT", "PYUSD"],
+  "accepted_assets": ["USDC", "USDT", "SOL", "POL"],
   "accepted_chains": ["polygon", "base", "solana"],
   "pay_to": { "polygon": "0xMerchant...", "solana": "Merc...111" },
   "nonce": "b7e2...c91a",
@@ -783,15 +781,15 @@ Every challenge and receipt carries a **single-use nonce** (≥128 bits). The me
 
 ## 19.1. Settlement models
 
-- **On-chain stablecoin.** The agent's wallet pays the merchant address in `USDC`/`USDT`/`PYUSD`; `tx_ref` is the tx hash. A non-custodial on-chain **payment splitter** can route protocol fees and multi-party splits atomically.
+- **On-chain.** The agent's wallet pays the merchant address in `USDC`/`USDT`/`SOL`/`POL` (`PYUSD` planned); `tx_ref` is the tx hash. A non-custodial on-chain **payment splitter** can route protocol fees and multi-party splits atomically.
 - **Fiat / stablecoin hybrid.** Via fiat rails (e.g., BVNK), settlement may originate or terminate in fiat with stablecoin in between. The receipt's `tx_ref` carries the settlement reference.
 
 ## 19.2. Supported networks (12)
 
 Networks are organized in three capability tiers (full list in **Appendix B**):
 
-- **Full Core (8):** Solana, Polygon, Avalanche, BNB Chain, Optimism, Arbitrum, Base, Unichain — Core + Passport + mSECCO escrow + Pyth oracle.
-- **Splitter-only EVM (2):** BOT Chain, XRPL EVM.
+- **Full Core (7):** Solana, Polygon, Avalanche, BNB Chain, Arbitrum, Base, Unichain — Core + Passport + mSECCO (non-transferable usage credits) + Pyth oracle.
+- **Splitter-only EVM (3):** Optimism, BOT Chain, XRPL EVM.
 - **Splitter MVP non-EVM (2):** NEAR, Aptos.
 
 ## 19.3. Settlement state machine
@@ -865,7 +863,7 @@ components:
       properties:
         merchant_id: { type: string }
         resource: { type: string }
-        pricing_tier: { type: string, enum: [standard, standard, complex, premium] }
+        pricing_tier: { type: string, enum: [standard, complex, premium] }
         currency: { type: string, default: USD }
     Quote:
       type: object
@@ -925,7 +923,7 @@ curl -i https://merchant.example.com/api/data \
 
 ## 22.1. Governance
 
-AIFP evolves through an **open RFC process** (`AIFP-N`). Anyone may submit a proposal; proposals move through *Draft → Review → Last Call → Accepted/Rejected → Final*. Reference implementations, compliance tests, and a certification suite accompany each ratified change.
+AIFP evolves through an **open RFC process** (`AIFP-N`). Anyone may submit a proposal; proposals move through *Draft → Review → Last Call → Accepted/Rejected*. Accepted changes are tracked in the public changelog (Appendix D).
 
 ## 22.2. Versioning policy
 
@@ -962,9 +960,8 @@ AIFP-1 is forward-compatible with the following extensions, specified in compani
 
 - **Agent Passport** — portable signed agent identity (`agt_*`/`pp_*`), wallet binding, delegated spending.
 - **Merchant Discovery Registry** — a registry and `.well-known` self-description so agents can discover priced resources.
-- **Dynamic Pricing Engine** — rule-based pricing clamped to `[min, max]`, with reputation discounts.
+- **Dynamic Pricing Engine** — rule-based pricing clamped to `[min, max]`.
 - **Streaming Payments** — payment channels for continuous/metered access.
-- **Agent Reputation Network** — reputation ∈ [0,1000] and risk ∈ [0,100] influencing pricing and trust.
 
 None of these are required for AIFP-1 conformance; all are optional and capability-negotiated.
 
@@ -977,7 +974,7 @@ None of these are required for AIFP-1 conformance; all are optional and capabili
 | **AIFP** | AiFinPay Paywall Protocol — this specification. |
 | **Agent** | Autonomous software client that consumes and pays for resources. |
 | **Agent Passport** | Optional signed agent identity credential (`agt_*`/`pp_*`). |
-| **Pricing Tier Tier** | Cost class of a resource: standard/standard/complex/premium. |
+| **Pricing tier** | Cost class of a resource: standard/complex/premium. |
 | **Control Plane** | AiFinPay backend: quoting, payment, receipts, ledger, webhooks. |
 | **Data Plane** | Merchant middleware: interception, quota, local verification. |
 | **Free Quota** | Free requests served before charging (default 100). |
@@ -997,11 +994,11 @@ None of these are required for AIFP-1 conformance; all are optional and capabili
 
 | Tier | Networks | Capabilities |
 |---|---|---|
-| **Full Core (8)** | Solana, Polygon, Avalanche, BNB Chain, Optimism, Arbitrum, Base, Unichain | Core + Passport + mSECCO escrow + Pyth oracle |
-| **Splitter-only EVM (2)** | BOT Chain, XRPL EVM | Payment splitter |
+| **Full Core (7)** | Solana, Polygon, Avalanche, BNB Chain, Arbitrum, Base, Unichain | Core + Passport + mSECCO (non-transferable usage credits) + Pyth oracle |
+| **Splitter-only EVM (3)** | Optimism, BOT Chain, XRPL EVM | Payment splitter |
 | **Splitter MVP non-EVM (2)** | NEAR, Aptos | Payment splitter (MVP) |
 
-Accepted assets: `USDC`, `USDT`, `PYUSD` (network-dependent). Fiat/stablecoin hybrid settlement via BVNK.
+Accepted assets: `USDC`, `USDT`, `SOL`, `POL` (network-dependent; `PYUSD` planned). Fiat/stablecoin hybrid settlement via BVNK.
 
 # Appendix C. Complete Error Registry
 
@@ -1026,7 +1023,7 @@ Accepted assets: `USDC`, `USDT`, `PYUSD` (network-dependent). Fiat/stablecoin hy
 
 | Version | Date | Change |
 |---|---|---|
-| 1.0.0 | 2026-06-28 | Initial Draft Standard publication. |
+| 1.0.0 | 2026-06-28 | Initial specification publication. |
 
 # Appendix E. References
 
@@ -1043,4 +1040,4 @@ Accepted assets: `USDC`, `USDT`, `PYUSD` (network-dependent). Fiat/stablecoin hy
 
 ---
 
-*End of AIFP-1. © 2026 AiFinPay, Inc. Licensed CC BY 4.0.*
+*End of AIFP-1. © 2026 CoinSecurities (SECCO) Pte. Ltd., Singapore Licensed CC BY 4.0.*

@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  AiFinPay Paywall Protocol (AIFP) turns <code>402 Payment Required</code> into a production-grade payment handshake: challenge, quote, pay, receipt, verify, access.
+  AIFP is an open payment protocol that enables AI agents to natively pay for websites, APIs, data, compute, and digital services, while enabling providers to monetize AI traffic instead of blocking it. HTTP 402 compatibility is one of its interoperability features.
 </p>
 
 <p align="center">
@@ -16,7 +16,7 @@
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-Apache--2.0%20%2B%20CC--BY--4.0-0B1020?style=for-the-badge"></a>
   <a href="docs/aifp/01-AIFP-1-RFC-Payment-Protocol-Specification.md"><img alt="Protocol" src="https://img.shields.io/badge/protocol-AIFP--1-14B8A6?style=for-the-badge"></a>
   <a href="docs/aifp/08-OpenAPI-3.1-Specification.yaml"><img alt="OpenAPI" src="https://img.shields.io/badge/OpenAPI-3.1-6BA539?style=for-the-badge"></a>
-  <a href="ROADMAP.md"><img alt="Status" src="https://img.shields.io/badge/status-draft%20standard-F59E0B?style=for-the-badge"></a>
+  <a href="ROADMAP.md"><img alt="Status" src="https://img.shields.io/badge/status-open%20protocol%20specification-F59E0B?style=for-the-badge"></a>
 </p>
 
 ---
@@ -111,7 +111,7 @@ flowchart LR
     end
 
     subgraph Settlement["Settlement Layer"]
-        Stablecoins["USDC / USDT / PYUSD"]
+        Stablecoins["SOL / POL / USDC / USDT (PYUSD planned)"]
         Chains["12 Supported Networks"]
         Fiat["Hybrid Fiat via BVNK"]
     end
@@ -144,7 +144,7 @@ AIFP separates the **control plane** from the **data plane**. The control plane 
 | Payment Challenge | Tells the agent how much, where, and how to pay | [AIFP-1](docs/aifp/01-AIFP-1-RFC-Payment-Protocol-Specification.md) |
 | Quote | Binding price for a specific resource | [OpenAPI](docs/aifp/08-OpenAPI-3.1-Specification.yaml) |
 | Receipt Token | Ed25519 signed proof of payment | [Security Spec](docs/aifp/04-Security-and-Cryptography-Specification.md) |
-| Agent Passport | Portable agent identity and reputation | [Agent SDK Spec](docs/aifp/03-AI-Agent-SDK-Specification.md) |
+| Agent Passport | Portable agent identity | [Agent SDK Spec](docs/aifp/03-AI-Agent-SDK-Specification.md) |
 | JSON Schemas | Validation source for protocol objects | [JSON Schemas](docs/aifp/10-JSON-Schemas.md) |
 | AIP Process | Governance for protocol evolution | [AIP Process](docs/aifp/06-AIP-Improvement-Proposal-Process.md) |
 
@@ -181,7 +181,7 @@ stateDiagram-v2
     "pricing_tier": "standard",
     "estimated_amount": "0.00001",
     "currency": "USD",
-    "accepted_assets": ["USDC", "USDT", "PYUSD"],
+    "accepted_assets": ["SOL", "POL", "USDC", "USDT"],
     "accepted_chains": ["polygon", "base", "solana"],
     "nonce": "b7e2...c91a",
     "expires_at": "2026-06-28T12:34:56Z"
@@ -222,7 +222,7 @@ Every receipt is verified locally by the merchant:
 | Settlement costs | Payment network, gas, processor, or settlement costs may apply separately |
 | Idempotency | `Idempotency-Key`, 24 hour dedupe window |
 | x402 migration | 1,000 free migration requests |
-| Assets | USDC, USDT, PYUSD |
+| Assets | SOL, POL, USDC, USDT (PYUSD planned) |
 | Networks | Solana, Polygon, Avalanche, BNB Chain, Optimism, Arbitrum, Base, Unichain, BOT Chain, XRPL EVM, NEAR, Aptos |
 | Native token | None |
 
@@ -231,6 +231,8 @@ Every receipt is verified locally by the merchant:
 ## Developer Experience
 
 ### Merchant Quick Start
+
+> `@aifinpay/merchant` is planned — for now verify receipts with a standard JWT library (e.g. `jose`), see snippet below.
 
 ```bash
 npm install @aifinpay/merchant
@@ -339,7 +341,7 @@ The repository roadmap focuses on public-release quality:
 3. Conformance test vectors.
 4. Reference merchant and agent SDK examples.
 5. Developer portal generation.
-6. Public AIP governance and certification program.
+6. Public AIP governance and a public changelog.
 
 See [ROADMAP.md](ROADMAP.md) for the full plan.
 
@@ -367,4 +369,4 @@ Code, examples, schemas, workflows, and automation are licensed under Apache-2.0
 
 ## Future Vision
 
-AIFP is designed to become a foundational standard for the AI web: a neutral payment layer where agents can discover priced resources, reason about budgets, pay safely, carry reputation, and access the machine-readable economy without subscriptions or human checkout.
+AIFP is designed to become a foundational open protocol for the AI web: a neutral payment layer where agents can discover priced resources, reason about budgets, pay safely, and access the machine-readable economy without subscriptions or human checkout.

@@ -6,11 +6,11 @@ Wallets fund agents, enforce spending controls, and settle value with merchants.
 
 | Mode | Description |
 |---|---|
-| Stablecoin | USDC, USDT, PYUSD settlement on supported networks |
+| Stablecoin | USDC, USDT settlement on supported networks; PYUSD (planned) |
+| Native asset | SOL (Solana) and POL/MATIC (Polygon) settlement |
 | Fiat hybrid | Fiat on/off-ramp with stablecoin settlement via BVNK |
-| Custodial | Platform-managed wallet for agents |
-| Non-custodial | Agent or user-controlled wallet |
-| MPC | Managed signing with distributed key custody |
+| Non-custodial | Agent or user-controlled wallet; the agent holds its own keys and signs locally |
+| MPC | Managed signing with distributed key custody (planned) |
 
 ## Settlement Flow
 

@@ -22,11 +22,11 @@ before it becomes normative.
 
 | Type | Scope | Examples |
 |---|---|---|
-| **Standards Track** | Changes to the protocol itself (wire format, endpoints, receipts, errors, networks). | New error code, new settlement chain, receipt claim addition. |
+| **Open Protocol Specification** | Changes to the protocol itself (wire format, endpoints, receipts, errors, networks). | New error code, new settlement chain, receipt claim addition. |
 | **Meta** | Changes to processes, governance, or the AIP process itself. | Amending this document; changing the review board. |
 | **Informational** | Guidelines, best practices, design notes; non-binding. | Recommended retry tuning; security advisories. |
 
-Standards Track AIPs are further sub-categorized: **Core** (protocol semantics),
+Open Protocol Specification AIPs are further sub-categorized: **Core** (protocol semantics),
 **Interface** (APIs/SDKs/schemas), **Networks** (chain support), **Security**.
 
 ---
@@ -52,7 +52,7 @@ Standards Track AIPs are further sub-categorized: **Core** (protocol semantics),
 | **Stagnant** | Inactive >6 months in Draft/Review. | Auto-marked; may be resurrected. |
 | **Superseded** | Replaced by a newer Final AIP. | Successor reaches Final. |
 
-A Standards Track AIP **cannot reach Final without a working reference implementation and
+An Open Protocol Specification AIP **cannot reach Final without a working reference implementation and
 passing conformance tests** (Doc 14).
 
 ---
@@ -99,7 +99,7 @@ AIFP follows **semantic versioning** (`MAJOR.MINOR.PATCH`) at the protocol level
 
 ## 6. Reference Implementation Rules
 
-- Every Standards Track AIP MUST link a reference implementation before **Final**.
+- Every Open Protocol Specification AIP MUST link a reference implementation before **Final**.
 - The implementation MUST pass the AIFP **conformance test suite** (Doc 14) and update it
   if new behavior is introduced.
 - Code examples in the AIP MUST match the OpenAPI spec (Doc 08), JSON Schemas (Doc 10),
@@ -126,8 +126,8 @@ AIFP follows **semantic versioning** (`MAJOR.MINOR.PATCH`) at the protocol level
 aip: <assigned by editors>
 title: <concise title>
 author: <name / handle / email>
-type: Standards Track | Meta | Informational
-category: Core | Interface | Networks | Security   # Standards Track only
+type: Open Protocol Specification | Meta | Informational
+category: Core | Interface | Networks | Security   # Open Protocol Specification only
 status: Draft
 created: YYYY-MM-DD
 requires: <AIP numbers, optional>
@@ -146,45 +146,44 @@ supersedes: <AIP number, optional>
 
 ---
 
-## 9. Example AIPs
+## 9. Example AIPs (illustrative)
 
-### AIP-1 — AIFP Improvement Proposal Process *(Meta, Final)*
-This document. Defines the process by which all other AIPs are created and ratified.
+### AIP-1 — AIFP Improvement Proposal Process *(Meta, Draft)*
+This document. Defines the process by which all other AIPs are created and adopted.
 
-### AIP-2 — Core Payment Protocol *(Standards Track · Core, Final)*
-**Abstract.** Ratifies AIFP-1 (Doc 01) as the normative protocol: HTTP-402 challenge,
+### AIP-2 — Core Payment Protocol *(Open Protocol Specification · Core, Draft)*
+**Abstract.** Specifies AIFP-1 (Doc 01) as the normative protocol: HTTP-402 challenge,
 quote/pay/receipt loop, Ed25519 stateless receipts (TTL 600s), agent action pricing tiers
 (Standard from $0.00001 / Complex from $0.00006 / Premium from $0.00010), 1% AiFinPay
 protocol fee, merchant settlement of the remaining 99% excluding applicable network or
 settlement costs, idempotency (24h), and error registry. **Backward Compatibility:**
 baseline; nothing to break.
 
-### AIP-7 — Add Unichain to Full Core Networks *(Standards Track · Networks, Final)*
+### AIP-7 — Add Unichain to Full Core Networks *(Open Protocol Specification · Networks, Draft)*
 **Abstract.** Adds Unichain to the Full Core tier (Core + Passport + mSECCO + Pyth),
 bringing supported networks to **12**. **Spec:** add `unichain` to the `chain` enum
 (Doc 08/10), publish payout-address format, extend conformance vectors. **Backward
 Compatibility:** MINOR — new optional chain; existing clients unaffected.
 
-### AIP-12 — Agent Passport & Reputation Network *(Standards Track · Core, Final)*
-**Abstract.** Introduces `pp_*` Agent Passports with Ed25519 identity, reputation
-∈ [0,1000] (start 500), risk ∈ [0,100], and trust levels
-(untrusted/basic/verified/enterprise). Adds `POST /v1/passports`, `GET /v1/passports/{id}`.
+### AIP-12 — Agent Passport *(Open Protocol Specification · Core, Draft)*
+**Abstract.** Introduces `pp_*` Agent Passports with Ed25519 identity (identity only).
+Adds `POST /v1/passports`, `GET /v1/passports/{id}`.
 **Backward Compatibility:** MINOR — additive endpoints and optional challenge fields.
 
-### AIP-19 — `AIFP-403-BUDGET-EXCEEDED` Error *(Standards Track · Interface, Final)*
+### AIP-19 — `AIFP-403-BUDGET-EXCEEDED` Error *(Open Protocol Specification · Interface, Draft)*
 **Abstract.** Adds a dedicated error for budget-policy breaches at `POST /v1/pay`.
 **Spec:** new code in the registry (Doc 01 App. C / Doc 08). **Backward Compatibility:**
 MINOR — new error code under existing `403` semantics.
 
-### AIP-23 — Streaming Payments via mSECCO Channels *(Standards Track · Core, Accepted)*
-**Abstract.** Defines payment channels for high-frequency metered consumption with escrow
-bound to the Agent Passport. **Status:** Accepted; awaiting reference implementation +
-conformance vectors before Final. **Backward Compatibility:** MINOR — opt-in capability
-gated by Protocol Negotiation.
+### AIP-23 — Streaming Payments via mSECCO Usage Credits *(Open Protocol Specification · Core, Draft)*
+**Abstract.** Defines high-frequency metered consumption prepaid with mSECCO
+non-transferable usage credits bound to the Agent Passport. **Status:** Draft; awaiting
+reference implementation + conformance vectors. **Backward Compatibility:** MINOR —
+opt-in capability gated by Protocol Negotiation.
 
-### AIP-31 — Dynamic Pricing Reputation Discount Cap *(Informational)*
+### AIP-31 — Dynamic Pricing Discount Cap *(Informational)*
 **Abstract.** Recommends clamping dynamic prices to `[min,max]` and capping
-reputation-based discounts at **−30%** to prevent gaming. Non-binding guidance for
+discounts at **−30%** to prevent gaming. Non-binding guidance for
 merchants implementing the Dynamic Pricing Engine.
 
 ---

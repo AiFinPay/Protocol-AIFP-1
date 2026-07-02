@@ -6,7 +6,7 @@ The AiFinPay sandbox is used to test challenge, quote, pay, receipt, retry, and 
 
 | Environment | URL |
 |---|---|
-| API | `https://sandbox.api.aifinpay.io` |
+| API | `https://sandbox.api.aifinpay.io` (planned) |
 | Docs | `https://docs.aifinpay.io` |
 | Production API | `https://api.aifinpay.io` |
 

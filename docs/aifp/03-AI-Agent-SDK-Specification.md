@@ -20,7 +20,7 @@
 
 ## Copyright Notice
 
-Copyright © 2026 AiFinPay, Inc. Licensed under CC BY 4.0. Code samples are Apache-2.0/MIT.
+Copyright © 2026 CoinSecurities (SECCO) Pte. Ltd., Singapore. Licensed under CC BY 4.0. Code samples are Apache-2.0/MIT.
 
 ---
 
@@ -81,7 +81,7 @@ flowchart TB
     POL --> QUOTE[Quote Client]
     QUOTE --> PAY[Pay Client]
     PAY --> WALLET[Wallet Manager]
-    WALLET --> SIGN[Signer: local / MPC / custodial]
+    WALLET --> SIGN[Signer: local key, agent-held]
     PAY --> RC[Receipt Cache]
     RC --> REPLAY[Request Replayer]
     REPLAY --> APP
@@ -109,9 +109,9 @@ flowchart TB
 ```bash
 npm install @aifinpay/agent      # TypeScript / Node
 pip install aifinpay-agent       # Python
-go get github.com/aifinpay/agent-go
-cargo add aifinpay-agent         # Rust
-# Java (Maven), C# (NuGet), PHP (Composer) — see §15
+go get github.com/aifinpay/agent-go   # (planned)
+cargo add aifinpay-agent         # Rust (planned)
+# Java (Maven), C# (NuGet), PHP (Composer) — planned, see §15
 ```
 
 ```ts
@@ -119,7 +119,7 @@ import { AifpAgent } from "@aifinpay/agent";
 
 const aifp = new AifpAgent({
   apiKey: process.env.AIFP_AGENT_KEY!,
-  wallet: { type: "custodial" },                 // or non-custodial / mpc
+  wallet: { type: "non-custodial" },             // agent holds keys, signs locally
   budget: { perRequest: "0.10", daily: "5.00" }, // caps
   chains: ["polygon", "base", "solana"],         // preference order
 });
@@ -187,10 +187,9 @@ stateDiagram-v2
 
 | Type | Custody | Signer | When to use |
 |---|---|---|---|
-| `custodial` | AiFinPay | AiFinPay | Fastest start, no key handling |
-| `non-custodial` | You | Local key | You control funds & signing |
-| `mpc` | Threshold | MPC quorum | Enterprise, no single key |
-| `fiat` | AiFinPay ledger | — | Prepaid USD balance |
+| `non-custodial` | You | Local key | You control funds & signing (the supported model: agent holds keys, signs locally) |
+| `mpc` *(planned)* | Threshold | MPC quorum | Enterprise, no single key |
+| `fiat` *(planned)* | Prepaid ledger | — | Prepaid USD balance |
 
 ## 6.2. Multiple wallets
 
@@ -201,7 +200,7 @@ const aifp = new AifpAgent({
   wallets: [
     { id: "w-usdc-poly", type: "non-custodial", chain: "polygon", asset: "USDC" },
     { id: "w-usdc-sol",  type: "non-custodial", chain: "solana",  asset: "USDC" },
-    { id: "w-fiat",      type: "fiat" },
+    { id: "w-fiat",      type: "fiat" },      // (planned)
   ],
   walletStrategy: "cheapest-then-fastest",
 });
@@ -248,7 +247,7 @@ flowchart LR
 
 # 8. Multi-Chain Routing
 
-The router picks `(chain, asset)` from the intersection of: challenge `accepted_chains`/`accepted_assets`, the agent's funded wallets, and the routing strategy. Supported networks (AIFP-1 Appendix B): **Full Core (8)** Solana, Polygon, Avalanche, BNB Chain, Optimism, Arbitrum, Base, Unichain; **Splitter-only EVM (2)** BOT Chain, XRPL EVM; **Splitter MVP non-EVM (2)** NEAR, Aptos.
+The router picks `(chain, asset)` from the intersection of: challenge `accepted_chains`/`accepted_assets`, the agent's funded wallets, and the routing strategy. Supported networks (AIFP-1 Appendix B): **Full Core (7)** Solana, Polygon, Avalanche, BNB Chain, Arbitrum, Base, Unichain; **Splitter-only EVM (3)** Optimism, BOT Chain, XRPL EVM; **Splitter MVP non-EVM (2)** NEAR, Aptos.
 
 ```ts
 // Routing decision (pseudocode)
@@ -271,7 +270,7 @@ Every request carries `AIFP-Agent-ID: agt_*`. This is the minimum identity and i
 
 ## 9.2. Agent Passport
 
-The **Agent Passport** is an optional, portable, Ed25519-signed identity credential (`agt_*` + `pp_*`) that binds an agent to its wallets, budget policies, and reputation, and is honored across merchants.
+The **Agent Passport** is an optional, portable, Ed25519-signed identity credential (`agt_*` + `pp_*`) that binds an agent to its wallets and budget policies, and is honored across merchants.
 
 ```json
 {
@@ -281,16 +280,13 @@ The **Agent Passport** is an optional, portable, Ed25519-signed identity credent
   "wallets": ["wlt_poly_usdc", "wlt_sol_usdc"],
   "budget_policy": { "perRequest": "0.10", "daily": "5.00" },
   "delegation": { "owner": "org_…", "scopes": ["pay", "quote"] },
-  "reputation": 500,
-  "trust_level": "verified",
   "issued_at": "2026-06-28T00:00:00Z",
   "signature": "ed25519-sig"
 }
 ```
 
-- **Wallet binding:** the Passport cryptographically binds approved wallets, optionally via an on-chain **mSECCO escrow** contract (Full Core networks).
+- **Wallet binding:** the Passport cryptographically binds approved wallets. (mSECCO are non-transferable usage credits.)
 - **Delegated spending:** an owner (org/parent agent) can issue scoped, time-bounded delegations so sub-agents pay within limits.
-- **Reputation / trust:** `reputation ∈ [0,1000]` (start 500), `risk ∈ [0,100]`, trust levels `untrusted | basic | verified | enterprise`. Merchants MAY use these for dynamic pricing or access. (Reputation network detail is governed by AIFP-1 §24 future extensions; security in Doc 4.)
 
 The Passport is OPTIONAL for AIFP-1 conformance — an agent MAY pay with only a funded wallet.
 
@@ -312,7 +308,7 @@ interface AifpAgent {
 }
 ```
 
-The same surface is mirrored across all seven language SDKs with idiomatic naming (snake_case in Python/PHP, PascalCase in C#, etc.).
+The same surface is mirrored across all language SDKs (TypeScript and Python live; others planned) with idiomatic naming (snake_case in Python/PHP, PascalCase in C#, etc.).
 
 ---
 
@@ -426,7 +422,7 @@ try {
 
 # 15. Language SDKs
 
-> Every SDK exposes: a `fetch`/HTTP wrapper that auto-pays, explicit `quote`/`pay`, wallet + budget config, and lifecycle hooks. Signatures differ only idiomatically.
+> Every SDK exposes: a `fetch`/HTTP wrapper that auto-pays, explicit `quote`/`pay`, wallet + budget config, and lifecycle hooks. Signatures differ only idiomatically. TypeScript (`@aifinpay/agent`), Python (`aifinpay-agent`), and the MCP server (`@aifinpay/mcp`) are live; Go, Rust, Java, C#, and PHP SDKs are planned.
 
 ## 15.1. TypeScript
 
@@ -627,4 +623,4 @@ Canonical glossary: AIFP-1 [Appendix A](./01-AIFP-1-RFC-Payment-Protocol-Specifi
 
 ---
 
-*End of AI Agent SDK Specification. © 2026 AiFinPay, Inc. Licensed CC BY 4.0.*
+*End of AI Agent SDK Specification. © 2026 CoinSecurities (SECCO) Pte. Ltd., Singapore. Licensed CC BY 4.0.*

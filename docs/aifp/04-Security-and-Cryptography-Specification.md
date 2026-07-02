@@ -20,7 +20,7 @@
 
 ## Copyright Notice
 
-Copyright © 2026 AiFinPay, Inc. Licensed under CC BY 4.0. Reference code is Apache-2.0/MIT.
+Copyright © 2026 CoinSecurities (SECCO) Pte. Ltd., Singapore. Licensed under CC BY 4.0. Reference code is Apache-2.0/MIT.
 
 ---
 
@@ -42,7 +42,7 @@ Copyright © 2026 AiFinPay, Inc. Licensed under CC BY 4.0. Reference code is Apa
 14. [Smart Contract & Chain Security](#14-smart-contract--chain-security)
 15. [Fiat Settlement Security](#15-fiat-settlement-security)
 16. [Rate Limiting, DDoS & Abuse Prevention](#16-rate-limiting-ddos--abuse-prevention)
-17. [Fraud Detection & Reputation](#17-fraud-detection--reputation)
+17. [Fraud Detection](#17-fraud-detection)
 18. [Monitoring & Audit Logging](#18-monitoring--audit-logging)
 19. [Secure Defaults & Security Checklist](#19-secure-defaults--security-checklist)
 20. [OWASP, SOC 2 & ISO 27001 Mapping](#20-owasp-soc-2--iso-27001-mapping)
@@ -207,7 +207,7 @@ Independently, a merchant MAY apply **policy authorization** (blocklist `agt_*`,
 | Transport | **TLS 1.3** | MUST; modern cipher suites only |
 | Hashing | **SHA-256 / SHA-512** | Fingerprints, content hashing |
 | API key at rest | **Argon2id** | Memory-hard; never store plaintext keys |
-| MPC signing | **Threshold Ed25519 / ECDSA** | t-of-n, no single key materializes |
+| MPC signing *(planned)* | **Threshold Ed25519 / ECDSA** | t-of-n, no single key materializes |
 | Randomness | **CSPRNG** | Nonces ≥128 bits from OS CSPRNG |
 
 **Non-goals / disallowed:** no `alg: none`, no HS256 for receipts (asymmetric only so merchants never hold a signing secret), no MD5/SHA-1, no TLS < 1.2 (1.3 REQUIRED for new deployments).
@@ -328,20 +328,21 @@ Webhook HMAC secrets and API keys support dual-secret rotation (accept old+new d
 
 # 13. Wallet Security & MPC
 
+AiFinPay is **strictly non-custodial**: the agent holds its own keys and signs locally. Keys are never sent to or held by AiFinPay.
+
 | Model | Key custody | Threat posture |
 |---|---|---|
-| Custodial | AiFinPay HSM | Strong operational security; AiFinPay is trusted custodian |
 | Non-custodial | Agent-held | Agent fully responsible; key never sent to AiFinPay |
-| **MPC** | t-of-n shares | No single point holds a usable key; tolerates share compromise |
+| **MPC** *(planned)* | t-of-n shares | No single point holds a usable key; tolerates share compromise |
 
-**MPC (recommended for enterprise):** threshold Ed25519/ECDSA splits signing across `n` parties; any `t` cooperate to sign, fewer than `t` learn nothing. No complete private key ever materializes, on any host, at any time. Share refresh (proactive secret sharing) periodically re-randomizes shares without changing the address. Spending policies (per-request/daily caps, allow-lists) are enforced as **pre-sign authorization**, so a compromised share cannot exceed policy.
+**MPC (planned — not a live offering):** threshold Ed25519/ECDSA splits signing across `n` parties; any `t` cooperate to sign, fewer than `t` learn nothing. No complete private key ever materializes, on any host, at any time. Share refresh (proactive secret sharing) periodically re-randomizes shares without changing the address. Spending policies (per-request/daily caps, allow-lists) are enforced as **pre-sign authorization**, so a compromised share cannot exceed policy.
 
 ---
 
 # 14. Smart Contract & Chain Security
 
 - **Payment splitter** (non-custodial): routes protocol fee and multi-party splits atomically; audited; minimal surface; reentrancy-guarded; pull-payment pattern where applicable.
-- **mSECCO escrow** (Full Core networks): binds Passport wallets and backs streaming channels; funds released only on signed conditions.
+- **mSECCO** (Full Core networks): non-transferable usage credits bound to Passport wallets; credited on settlement, never transferable between agents.
 - **Oracle:** **Pyth** price feeds for asset/USD conversion; staleness and confidence-interval checks before using a price.
 - **Chain risk:** confirmation-depth policy per chain for high-value resources; re-org awareness; per-network capability tiers (Full Core / Splitter-only EVM / Splitter MVP non-EVM, AIFP-1 Appendix B).
 - **Contract upgradeability:** timelock + multisig on any upgradeable component; immutable where possible.
@@ -370,11 +371,10 @@ Because verification is local and stateless, a DDoS against merchants cannot be 
 
 ---
 
-# 17. Fraud Detection & Reputation
+# 17. Fraud Detection
 
 - **Signals:** velocity (pays/sec), failed-verify ratio, nonce-replay attempts, chargeback rate, anomalous chain/asset switching, budget-breach frequency.
-- **Agent Reputation Network:** `reputation ∈ [0,1000]` (start 500), `risk ∈ [0,100]`, trust levels `untrusted | basic | verified | enterprise`. Reputation rises with successful, dispute-free settlement and falls with fraud/abuse. Merchants MAY require a minimum trust level or apply reputation-based pricing (max −30% discount).
-- **Actions:** step-up (require Passport / higher confirmations), throttle, or blocklist (`403`). All automated decisions are logged and appealable via governance.
+- **Actions:** step-up (require Passport / higher confirmations), throttle, or blocklist (`403`). All automated decisions are logged and appealable.
 
 ---
 
@@ -445,7 +445,7 @@ Cryptography (A.8.24) — EdDSA/TLS/HSM; Access control (A.5.15–18) — scoped
 
 # 21. Glossary
 
-Canonical glossary: AIFP-1 [Appendix A](./01-AIFP-1-RFC-Payment-Protocol-Specification.md#appendix-a-glossary). Security-specific terms: **Issuer Key**, **JWKS / kid**, **Nonce Store**, **Idempotency Key**, **MPC (threshold signing)**, **mSECCO escrow**, **Payment Splitter**, **Reputation/Risk/Trust Level**, **HSM/KMS**, **Degraded Mode**, **Append-only Audit Log**.
+Canonical glossary: AIFP-1 [Appendix A](./01-AIFP-1-RFC-Payment-Protocol-Specification.md#appendix-a-glossary). Security-specific terms: **Issuer Key**, **JWKS / kid**, **Nonce Store**, **Idempotency Key**, **MPC (threshold signing)**, **mSECCO (non-transferable usage credits)**, **Payment Splitter**, **HSM/KMS**, **Degraded Mode**, **Append-only Audit Log**.
 
 ---
 
@@ -459,4 +459,4 @@ Canonical glossary: AIFP-1 [Appendix A](./01-AIFP-1-RFC-Payment-Protocol-Specifi
 
 ---
 
-*End of Security & Cryptography Specification. © 2026 AiFinPay, Inc. Licensed CC BY 4.0.*
+*End of Security & Cryptography Specification. © 2026 CoinSecurities (SECCO) Pte. Ltd., Singapore. Licensed CC BY 4.0.*

@@ -98,7 +98,7 @@ flowchart LR
     Root --> GitHub[".github"]
 
     Docs --> Canonical["docs/aifp canonical docs"]
-    SDK --> Languages["TS / Python / Go / Rust / Java / PHP / .NET"]
+    SDK --> Languages["TS / Python — Go / Rust / Java / PHP / .NET (planned)"]
     Examples --> Recipes["merchant / agent / wallet / webhooks"]
     Tests --> Conformance["protocol conformance"]
 ```

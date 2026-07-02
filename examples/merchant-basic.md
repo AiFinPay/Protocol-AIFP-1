@@ -2,6 +2,8 @@
 
 This example shows a merchant protecting `/api/data` with AIFP.
 
+> Note: `@aifinpay/merchant` is planned — for now verify receipts with a standard JWT library (e.g. `jose`). Live SDKs today: Python (`aifinpay-agent`), Node (`@aifinpay/agent`), MCP (`@aifinpay/mcp`).
+
 ```ts
 import express from "express";
 import { aifpPaywall } from "@aifinpay/merchant";

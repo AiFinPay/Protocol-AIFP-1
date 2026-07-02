@@ -1,6 +1,6 @@
 # AiFinPay Protocol Documentation
 
-The official documentation ecosystem for the **AiFinPay Paywall Protocol (AIFP)** — an application-layer payment protocol on top of HTTP that lets autonomous AI agents pay for content, data, and APIs automatically, with no human in the loop.
+The official documentation ecosystem for the **AiFinPay Paywall Protocol (AIFP)**. AIFP is an open payment protocol that enables AI agents to natively pay for websites, APIs, data, compute, and digital services, while enabling providers to monetize AI traffic instead of blocking it. HTTP 402 compatibility is one of its interoperability features.
 
 ## Documents
 
@@ -40,4 +40,4 @@ AiFinPay charges a **1% protocol fee** on every successful transaction. The rema
 
 ## Status
 
-Version 1.0.0 · Draft Standard · June 28, 2026 · © 2026 AiFinPay, Inc.
+Version 1.0.0 · Open Protocol Specification · June 28, 2026 · © 2026 CoinSecurities (SECCO) Pte. Ltd., Singapore

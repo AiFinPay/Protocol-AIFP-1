@@ -1,15 +1,15 @@
 # AiFinPay Paywall Roadmap
 
-AiFinPay Paywall Protocol is moving from draft documentation toward a public protocol release, conformance program, and production SDK ecosystem.
+AiFinPay Paywall Protocol is moving from draft documentation toward a public protocol release, conformance test suite, and production SDK ecosystem.
 
 ## Release Tracks
 
 | Track | Goal | Status |
 |---|---|---|
-| Protocol | Stabilize AIFP-1 and AIP process | Draft Standard |
+| Protocol | Stabilize AIFP-1 and AIP process | Open Protocol Specification |
 | API | Publish OpenAPI 3.1 and schema validation | In progress |
 | SDKs | Merchant and agent SDKs across major languages | Planned |
-| Conformance | Test vectors and certification suite | Planned |
+| Conformance | Test vectors and conformance suite | Planned |
 | Portal | Developer portal generated from docs-as-code | Planned |
 | Governance | Open AIP workflow and security council | Draft |
 
@@ -51,14 +51,14 @@ AiFinPay Paywall Protocol is moving from draft documentation toward a public pro
 - [ ] JWKS and key rotation tests
 - [ ] CI conformance workflow
 
-### v1.0 Draft Standard Release
+### v1.0 Open Protocol Specification Release
 
 - [ ] AIFP-1 tagged release
 - [ ] Public developer portal
 - [ ] Security review
 - [ ] AIP governance opened
 - [ ] SDK packages published
-- [ ] Certification program announced
+- [ ] Public changelog published
 
 ## Non-Goals
 

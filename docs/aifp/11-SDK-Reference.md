@@ -16,7 +16,7 @@
 | `Merchant` / `Verifier` | Verifies receipts statelessly (JWKS cache). |
 | `Quote` | `{ quote_id, amount, currency, accepted_assets, accepted_chains, nonce, expires_at }` |
 | `Receipt` | `{ receipt_id, receipt(jwt), status, tx_ref, amount, fee, expires_at }` |
-| `Passport` | `{ passport_id, agent_id, reputation(0–1000), risk(0–100), trust_level }` |
+| `Passport` | `{ passport_id, agent_id }` — identity only. |
 | Errors | Typed exceptions mapping the `AIFP-*` registry (Doc 01 App. C). |
 
 **Shared options:** `apiKey` (`sk_live_*`/`sk_test_*`), `baseUrl`
@@ -38,7 +38,7 @@ AiFinPay applies a **1% protocol fee** to every successful transaction. The rema
 
 ## 1. TypeScript / Node — `@aifinpay/agent`, `@aifinpay/merchant`
 
-**Install:** `npm i @aifinpay/agent @aifinpay/merchant`
+**Install:** `npm i @aifinpay/agent` (`@aifinpay/merchant` is planned — for now verify receipts with a standard JWT library such as `jose`, see snippet)
 
 ### Classes
 - `Agent` — autonomous client.
@@ -66,7 +66,7 @@ await agent.setBudget({ window: "day", capUsd: "50.00" });
 ### Interfaces
 ```ts
 interface QuoteRequest { merchantId: string; resource: string; pricingTier?: "standard"|"complex"|"premium"; currency?: "USD"; }
-interface PayRequest   { quoteId: string; walletId: string; asset: "USDC"|"USDT"|"PYUSD"; chain: Chain; idempotencyKey?: string; }
+interface PayRequest   { quoteId: string; walletId: string; asset: "USDC"|"USDT"|"SOL"|"POL"; chain: Chain; idempotencyKey?: string; } // PYUSD planned
 interface Receipt      { receiptId: string; receipt: string; status: "settled"|"settling"|"expired"|"revoked"; txRef?: string; amount: string; fee?: string; expiresAt: string; }
 ```
 
@@ -93,7 +93,7 @@ request. Always set a budget on production agents.
 
 ## 2. Python — `aifinpay-agent`, `aifinpay-merchant`
 
-**Install:** `pip install aifinpay-agent aifinpay-merchant`
+**Install:** `pip install aifinpay-agent` (`aifinpay-merchant` is planned — for now verify receipts with a standard JWT library, see snippet)
 
 ```python
 from aifinpay_agent import Agent, BudgetExceeded
@@ -130,7 +130,7 @@ ok, claims = verify_receipt(jwt, merchant_id="mrch_9f3a1c2b", resource="/api/dat
 
 ---
 
-## 3. Go — `github.com/aifinpay/aifp-go`
+## 3. Go — `github.com/aifinpay/aifp-go` (planned)
 
 **Install:** `go get github.com/aifinpay/aifp-go`
 
@@ -156,7 +156,7 @@ claims, err := v.Verify(jwt, aifp.VerifyOpts{Resource: "/api/data"})
 
 ---
 
-## 4. Rust — `aifinpay`
+## 4. Rust — `aifinpay` (planned)
 
 **Install:** `cargo add aifinpay`
 
@@ -179,7 +179,7 @@ let claims = v.verify(&jwt, "/api/data")?; // Result<Claims, AifpError>
 
 ---
 
-## 5. Java — `io.aifinpay:aifp`
+## 5. Java — `io.aifinpay:aifp` (planned)
 
 **Install:** `implementation "io.aifinpay:aifp:1.0.0"`
 
@@ -201,7 +201,7 @@ Checked exception `AifpException` exposes `getCode()`. Listeners via
 
 ---
 
-## 6. PHP — `aifinpay/aifp`
+## 6. PHP — `aifinpay/aifp` (planned)
 
 **Install:** `composer require aifinpay/aifp`
 
@@ -223,7 +223,7 @@ PSR-3 logging supported.
 
 ---
 
-## 7. C# / .NET — `AiFinPay`
+## 7. C# / .NET — `AiFinPay` (planned)
 
 **Install:** `dotnet add package AiFinPay`
 
@@ -245,7 +245,7 @@ var (valid, claims) = await verifier.VerifyAsync(jwt, resource: "/api/data");
 
 ## Cross-language guarantees
 
-1. **Identical pricing & enums** — action pricing tiers (Standard from $0.00001, Complex from $0.00006, Premium from $0.00010), assets (USDC/USDT/PYUSD), and the 12-chain set are the same everywhere.
+1. **Identical pricing & enums** — action pricing tiers (Standard from $0.00001, Complex from $0.00006, Premium from $0.00010), assets (USDC/USDT/SOL/POL; PYUSD planned), and the 12-chain set are the same everywhere.
 2. **Protocol fee** — every SDK surfaces the 1% AiFinPay protocol fee and merchant net settlement amount where available.
 3. **Stateless verify** — every `Verifier` performs the AIFP-1 §7.4 10-step check with no network call; only JWKS is cached.
 4. **Idempotency** — `pay()` auto-attaches an `Idempotency-Key` (24h window) unless overridden.

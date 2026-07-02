@@ -11,7 +11,7 @@ Agents use AIFP to automatically pay for protected resources while respecting bu
 | Enforce budget | Prevent unwanted spend |
 | Pay safely | Use wallet and idempotency key |
 | Retry request | Attach receipt and replay the original request |
-| Track reputation | Use Agent Passport where available |
+| Prove identity | Use Agent Passport (identity) where available |
 
 ## Agent Flow
 

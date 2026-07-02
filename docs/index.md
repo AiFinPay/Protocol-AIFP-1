@@ -2,7 +2,7 @@
 
 Welcome to the AiFinPay Paywall Protocol documentation portal.
 
-AIFP is an HTTP-native payment protocol that lets autonomous AI agents pay for APIs, content, and data through a `402 Payment Required` flow.
+AIFP is an open payment protocol that enables AI agents to natively pay for websites, APIs, data, compute, and digital services, while enabling providers to monetize AI traffic instead of blocking it. HTTP 402 compatibility is one of its interoperability features.
 
 ## Start Here
 

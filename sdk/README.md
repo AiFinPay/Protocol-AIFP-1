@@ -6,9 +6,9 @@ AiFinPay SDKs provide merchant middleware, agent auto-pay clients, receipt verif
 
 | Language | Merchant SDK | Agent SDK | Package Target |
 |---|---:|---:|---|
-| TypeScript / Node | Yes | Yes | `@aifinpay/merchant`, `@aifinpay/agent` |
-| Python | Yes | Yes | `aifinpay-merchant`, `aifinpay-agent` |
-| Go | Yes | Yes | `github.com/aifinpay/aifp-go` |
+| TypeScript / Node | Planned (for now verify with a standard JWT library) | Yes | `@aifinpay/merchant` (planned), `@aifinpay/agent` |
+| Python | Planned (for now verify with a standard JWT library) | Yes | `aifinpay-merchant` (planned), `aifinpay-agent` |
+| Go | Planned | Planned | `github.com/aifinpay/aifp-go` |
 | Rust | Planned | Planned | `aifinpay` |
 | Java | Planned | Planned | `io.aifinpay:aifp` |
 | PHP | Planned | Planned | `aifinpay/aifp` |

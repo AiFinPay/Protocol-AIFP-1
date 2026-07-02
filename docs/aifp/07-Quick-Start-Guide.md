@@ -3,9 +3,10 @@
 **Document:** AIFP-DOC-07 · **Reading time:** ~5 minutes · **Governed by:** AIFP-1 (Doc 01)
 
 Get paid (merchant) or pay autonomously (agent) with the **AiFinPay Paywall
-Protocol (AIFP)** in minutes. AIFP turns HTTP `402 Payment Required` into a real,
-machine-payable response so AI agents can buy API calls, data, and compute without
-a human in the loop.
+Protocol (AIFP)** in minutes. AIFP is an open payment protocol that enables AI
+agents to natively pay for websites, APIs, data, compute, and digital services,
+while enabling providers to monetize AI traffic instead of blocking it. HTTP 402
+compatibility is one of its interoperability features.
 
 > **The 4-step loop**
 > `402 challenge` → `POST /v1/quote` → `POST /v1/pay` (get receipt) → retry with `X-AIFP-Receipt`.
@@ -17,7 +18,7 @@ a human in the loop.
 | You need | Where |
 |---|---|
 | Sandbox API key (`sk_test_...`) | https://dashboard.aifinpay.io → API Keys |
-| Base URL | Sandbox `https://sandbox.api.aifinpay.io` · Prod `https://api.aifinpay.io` |
+| Base URL | Sandbox `https://sandbox.api.aifinpay.io` (planned) · Prod `https://api.aifinpay.io` |
 | (Agents) a funded test wallet | created in Agent Quick Start below |
 
 Pricing is action-tier based:
@@ -40,14 +41,19 @@ verify the receipt it brings back.
 ### a. Install
 
 ```bash
-npm install @aifinpay/merchant     # Node
-pip install aifinpay-merchant      # Python
+npm install @aifinpay/merchant     # Node (planned)
+pip install aifinpay-merchant      # Python (planned)
 ```
+
+> The merchant SDK is **planned** — for now verify receipts with a standard JWT
+> library (e.g. `jose` / PyJWT), see the verification snippet below.
 
 ### b. Wrap your endpoint (Express)
 
 ```js
 import express from "express";
+// @aifinpay/merchant is planned — for now verify receipts with a standard
+// JWT library (e.g. jose), see the manual verification snippet below.
 import { aifp } from "@aifinpay/merchant";
 
 const app = express();
@@ -71,6 +77,8 @@ your handler.
 ### c. Verify a receipt manually (any language)
 
 ```python
+# aifinpay-merchant is planned — for now verify the EdDSA JWT with a
+# standard library (e.g. PyJWT) against /.well-known/jwks.json.
 from aifinpay_merchant import verify_receipt
 ok, claims = verify_receipt(jwt, merchant_id="mrch_9f3a1c2b", resource="/api/data")
 # ok == True only if signature + aud + resource + amount + exp + unused-nonce all pass
@@ -127,7 +135,7 @@ agent.set_budget(window="day", cap_usd="50.00")
 ```python
 from aifinpay_agent import Wallet
 
-# Non-custodial wallet (keys stay with you). custodial also supported.
+# Non-custodial wallet — the agent holds its own keys and signs locally.
 wallet = Wallet.create(api_key="sk_test_...", agent_id="agt_4f9a2c7e", type="non_custodial")
 print(wallet.wallet_id)            # wlt_3a1b
 
@@ -136,9 +144,10 @@ wallet.fund_test(asset="USDC", amount="25.00", chain="polygon")
 print(wallet.balances())           # {"USDC": "25.00"}
 ```
 
-Supported assets: **USDC, USDT, PYUSD**. Supported chains: 12 networks — Full Core
-(8) Solana, Polygon, Avalanche, BNB Chain, Optimism, Arbitrum, Base, Unichain;
-Splitter-only EVM (2) BOT Chain, XRPL EVM; MVP non-EVM (2) NEAR, Aptos.
+Supported assets: **USDC, USDT, SOL, POL (MATIC)**; PYUSD (planned). Supported
+chains: 12 networks — Full Core (7) Solana, Polygon, Avalanche, BNB Chain,
+Arbitrum, Base, Unichain; Splitter-only EVM (3) Optimism, BOT Chain, XRPL EVM;
+MVP non-EVM (2) NEAR, Aptos.
 
 ---
 
@@ -146,13 +155,13 @@ Splitter-only EVM (2) BOT Chain, XRPL EVM; MVP non-EVM (2) NEAR, Aptos.
 
 | Language | Agent SDK | Merchant SDK |
 |---|---|---|
-| TypeScript/Node | `npm i @aifinpay/agent` | `npm i @aifinpay/merchant` |
-| Python | `pip install aifinpay-agent` | `pip install aifinpay-merchant` |
-| Go | `go get github.com/aifinpay/aifp-go` | same module |
-| Rust | `cargo add aifinpay` | same crate |
-| Java | `implementation "io.aifinpay:aifp:1.0.0"` | same |
-| PHP | `composer require aifinpay/aifp` | same |
-| C# | `dotnet add package AiFinPay` | same |
+| TypeScript/Node | `npm i @aifinpay/agent` | `npm i @aifinpay/merchant` (planned) |
+| Python | `pip install aifinpay-agent` | `pip install aifinpay-merchant` (planned) |
+| Go (planned) | `go get github.com/aifinpay/aifp-go` | same module |
+| Rust (planned) | `cargo add aifinpay` | same crate |
+| Java (planned) | `implementation "io.aifinpay:aifp:1.0.0"` | same |
+| PHP (planned) | `composer require aifinpay/aifp` | same |
+| C# (planned) | `dotnet add package AiFinPay` | same |
 
 Full method reference: **Doc 11 — SDK Reference**.
 
@@ -192,7 +201,7 @@ quote → pay → receipt and auto-generates the `Idempotency-Key`.
 
 ## 7. Sandbox vs Production
 
-| | Sandbox | Production |
+| | Sandbox (planned) | Production |
 |---|---|---|
 | Base URL | `sandbox.api.aifinpay.io` | `api.aifinpay.io` |
 | Keys | `sk_test_...` | `sk_live_...` |

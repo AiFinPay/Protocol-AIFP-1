@@ -32,9 +32,9 @@ implement it without permission. AIFP is open because:
    implementation and commercial settlement service; the **protocol** is independent and
    governed in the open (AIP process).
 3. **Interoperate, don't enclose.** Maintain x402 compatibility and standard stablecoins
-   (USDC/USDT/PYUSD) rather than proprietary rails.
-4. **Pursue formal standardization.** Track toward recognition by an appropriate standards
-   body as adoption matures (2027 roadmap).
+   (USDC/USDT; PYUSD planned) rather than proprietary rails.
+4. **Evolve in the open.** All protocol changes are documented in a public changelog with
+   versioned specifications.
 
 ---
 
@@ -50,7 +50,7 @@ interoperate safely.
 
 ## 4. Governance
 
-**4.1. Bodies.**
+**4.1. Bodies (planned governance structure — not yet constituted).**
 - **AIP Editors** — process gatekeepers (formatting, numbering, status).
 - **Review Board** — domain maintainers (Protocol, Security, SDK, Networks) who vote on
   technical merit.
@@ -77,24 +77,25 @@ deliberate move from *vendor-stewarded* to *community-stewarded* as the standard
 
 ---
 
-## 6. Certification
+## 6. Certification (planned)
 
-An implementation may advertise **"AIFP-1 Conformant"** only if it:
+Under the planned program, an implementation may advertise **"AIFP-1 Conformant"** only if it:
 1. Passes the official **conformance test suite** (§8) for its role (merchant, agent,
    wallet, or full).
 2. Verifies receipts per AIFP-1 §7.4 (stateless, all 10 checks).
 3. Honors the canonical pricing tiers, error registry, and idempotency rules.
 4. Re-certifies on each protocol MINOR/MAJOR it claims to support.
 
-A public **conformance badge + registry** lists certified implementations and the
-version(s) they pass.
+A public **conformance badge + registry** (planned) would list certified implementations
+and the version(s) they pass.
 
 ---
 
 ## 7. Reference Implementations
 
-- AiFinPay maintains reference **server**, **merchant SDK**, and **agent SDK**
-  implementations (Doc 15) under Apache-2.0.
+- AiFinPay maintains reference **server** and **agent SDK** implementations (Doc 15)
+  under Apache-2.0 — live SDKs: Python (`aifinpay-agent`), Node (`@aifinpay/agent`),
+  MCP (`@aifinpay/mcp`); a **merchant SDK** is planned.
 - Reference implementations are **normative-tracking**: every Final AIP updates them.
 - They are intended for learning and conformance comparison, not as the only allowed
   implementation — alternative independent implementations are explicitly encouraged.
@@ -138,8 +139,8 @@ AIFP's endgame is to be **assumed infrastructure**: the default payment layer ev
 framework and monetizable API speaks, governed by an open multi-stakeholder community,
 neutral and tokenless, settling across many chains and hybrid fiat. The two-sided flywheel
 — more merchants → more value for agents → more agents → more value for merchants — plus
-open governance and conformance certification is how AIFP compounds from a product into a
-**standard**.
+an open specification with a public changelog is how AIFP compounds from a product into a
+widely adopted **open protocol**.
 
 See the Whitepaper (Doc 05 §16–18) for the strategic arc and the AIP process (Doc 06) for
 how the community drives it.

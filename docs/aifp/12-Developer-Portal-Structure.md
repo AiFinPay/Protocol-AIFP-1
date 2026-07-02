@@ -24,7 +24,7 @@ docs.aifinpay.io
 │   ├── HTTP 402 & the Payment Challenge (AIFP-1 §5–6)
 │   ├── Receipts & Stateless Verification (AIFP-1 §7)
 │   ├── Action Pricing & Fees (Standard · Complex · Premium · 1% protocol fee)
-│   ├── Agent Passport, Reputation & Trust (AIFP-1 §38,42)
+│   ├── Agent Passport & Identity (AIFP-1 §38,42)
 │   ├── Budgets & Idempotency
 │   └── Settlement & Multi-chain (12 networks)
 ├── Guides
@@ -41,7 +41,7 @@ docs.aifinpay.io
 │   └── JSON Schemas (Doc 10)
 ├── SDKs
 │   ├── SDK Reference (Doc 11)
-│   ├── TypeScript · Python · Go · Rust · Java · PHP · C#
+│   ├── TypeScript · Python (Go · Rust · Java · PHP · C# planned)
 │   └── Downloads & Versions
 ├── Tools
 │   ├── Sandbox (test keys · faucet)
@@ -91,14 +91,14 @@ docs.aifinpay.io
 - Rendered from **`08-OpenAPI-3.1-Specification.yaml`** (single source).
 - Try-it-out with a **sandbox** key prefilled (`sk_test_*`), never production by default.
 - Per-operation: request schema, response schemas, examples, error table, and
-  copy-paste snippets in all 7 SDK languages + cURL.
+  copy-paste snippets in TypeScript, Python + cURL (other SDK languages planned).
 - "Run in Postman" button (links Doc 09 collection).
 
 ---
 
 ## 5. Code Samples & Recipes
 
-Each recipe is runnable and language-tabbed (TS/Py/Go/Rust/Java/PHP/C#/cURL):
+Each recipe is runnable and language-tabbed (TS/Py/cURL; Go/Rust/Java/PHP/C# planned):
 - Paywall an endpoint · Pay through a 402 · Verify a receipt · Set a budget ·
   Create an Agent Passport · Migrate from x402 · Handle async (`202`) settlement ·
   Webhook signature verification.
@@ -122,13 +122,14 @@ Samples are **lint-checked in CI against the OpenAPI + JSON Schemas** so they ca
 
 | Language | Package | Badge |
 |---|---|---|
-| TypeScript | `@aifinpay/agent`, `@aifinpay/merchant` | npm version |
-| Python | `aifinpay-agent`, `aifinpay-merchant` | PyPI |
-| Go | `github.com/aifinpay/aifp-go` | pkg.go.dev |
-| Rust | `aifinpay` | crates.io |
-| Java | `io.aifinpay:aifp` | Maven Central |
-| PHP | `aifinpay/aifp` | Packagist |
-| C# | `AiFinPay` | NuGet |
+| TypeScript | `@aifinpay/agent` (`@aifinpay/merchant` planned) | npm version |
+| Python | `aifinpay-agent` (`aifinpay-merchant` planned) | PyPI |
+| MCP | `@aifinpay/mcp` | npm version |
+| Go | `github.com/aifinpay/aifp-go` (planned) | pkg.go.dev |
+| Rust | `aifinpay` (planned) | crates.io |
+| Java | `io.aifinpay:aifp` (planned) | Maven Central |
+| PHP | `aifinpay/aifp` (planned) | Packagist |
+| C# | `AiFinPay` (planned) | NuGet |
 
 Each card links source repo (Doc 15), changelog, and the SDK Reference (Doc 11) section.
 
@@ -136,7 +137,7 @@ Each card links source repo (Doc 15), changelog, and the SDK Reference (Doc 11) 
 
 ## 8. Sandbox
 
-- Base URL `https://sandbox.api.aifinpay.io`, test keys, **faucet** for USDC/USDT/PYUSD.
+- Base URL `https://sandbox.api.aifinpay.io` (planned), test keys, **faucet** for SOL/POL/USDC/USDT (PYUSD planned).
 - Simulated settlement; test `kid` JWKS. One-click "reset sandbox" and "seed merchant +
   agent + wallet" fixtures.
 
@@ -155,7 +156,7 @@ Each card links source repo (Doc 15), changelog, and the SDK Reference (Doc 11) 
 
 - *Does AIFP have a token?* No — tokenless by design (Whitepaper §14).
 - *Do I call AiFinPay to verify a receipt?* No — verification is local/stateless (§7.4).
-- *Which chains/assets?* 12 networks; USDC/USDT/PYUSD (Doc 01 App. B).
+- *Which chains/assets?* 12 networks; SOL, POL, USDC/USDT (PYUSD planned) (Doc 01 App. B).
 - *How do micropayments work?* Agent actions are priced by tier: Standard from $0.00001, Complex from $0.00006, Premium from $0.00010.
 - *What is the protocol fee?* AiFinPay charges 1% on successful transactions; 99% settles to the merchant, excluding applicable network or settlement costs.
 - *Is it x402-compatible?* Yes, with 1,000 free migration requests.

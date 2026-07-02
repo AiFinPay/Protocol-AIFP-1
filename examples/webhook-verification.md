@@ -3,6 +3,7 @@
 AIFP webhooks must be signed and timestamp-verified.
 
 ```ts
+// @aifinpay/merchant is planned — for now verify with a standard HMAC/JWT library, see snippet below.
 import { verifyWebhook } from "@aifinpay/merchant";
 
 app.post("/webhooks/aifp", express.raw({ type: "application/json" }), (req, res) => {

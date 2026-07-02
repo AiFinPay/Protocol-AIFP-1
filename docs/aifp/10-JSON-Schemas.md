@@ -67,7 +67,7 @@ The AiFinPay Protocol Fee is `1%` of every successful transaction. The remaining
       "const": 0.99,
       "description": "Merchant settlement share before external network or settlement costs."
     },
-    "asset": { "type": "string", "enum": ["USDC", "USDT", "PYUSD"] },
+    "asset": { "type": "string", "enum": ["USDC", "USDT", "SOL", "POL"], "description": "Live settlement assets. PYUSD support is planned." },
     "chain": {
       "type": "string",
       "enum": ["solana", "polygon", "avalanche", "bnb", "optimism", "arbitrum", "base", "unichain", "bot_chain", "xrpl_evm", "near", "aptos"]
@@ -240,7 +240,7 @@ The AiFinPay Protocol Fee is `1%` of every successful transaction. The remaining
   "properties": {
     "wallet_id": { "$ref": "common.json#/$defs/walletId" },
     "agent_id": { "$ref": "common.json#/$defs/agentId" },
-    "type": { "type": "string", "enum": ["custodial", "non_custodial"] },
+    "type": { "type": "string", "enum": ["non_custodial"], "description": "AIFP wallets are strictly non-custodial: the agent holds its keys and signs locally." },
     "balances": { "type": "object", "additionalProperties": { "type": "string" } },
     "budget": {
       "type": "object",
@@ -264,14 +264,11 @@ The AiFinPay Protocol Fee is `1%` of every successful transaction. The remaining
   "$id": "https://schemas.aifinpay.io/v1/passport.json",
   "title": "AIFP Agent Passport",
   "type": "object",
-  "required": ["passport_id", "agent_id", "reputation", "risk", "trust_level"],
+  "required": ["passport_id", "agent_id"],
   "properties": {
     "passport_id": { "$ref": "common.json#/$defs/passportId" },
     "agent_id": { "$ref": "common.json#/$defs/agentId" },
     "public_key": { "type": "string", "description": "Ed25519 public key (base64url)." },
-    "reputation": { "type": "integer", "minimum": 0, "maximum": 1000, "default": 500 },
-    "risk": { "type": "integer", "minimum": 0, "maximum": 100 },
-    "trust_level": { "type": "string", "enum": ["untrusted", "basic", "verified", "enterprise"] },
     "created_at": { "type": "string", "format": "date-time" }
   },
   "additionalProperties": false

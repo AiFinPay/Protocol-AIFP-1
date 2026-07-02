@@ -2,11 +2,12 @@ openapi: 3.1.0
 info:
   title: AiFinPay Paywall Protocol (AIFP) API
   version: 1.0.0
-  summary: HTTP-402 native payment protocol for autonomous AI agents and merchants.
+  summary: Open payment protocol for autonomous AI agents and merchants.
   description: |
-    The **AiFinPay Paywall Protocol (AIFP)** is an open, HTTP-402-native payment
-    standard that lets merchants charge AI agents per request and lets agents pay
-    autonomously using stablecoins or hybrid fiat settlement.
+    The **AiFinPay Paywall Protocol (AIFP)** is an open payment protocol that
+    enables AI agents to natively pay for websites, APIs, data, compute, and
+    digital services, while enabling providers to monetize AI traffic instead of
+    blocking it. HTTP 402 compatibility is one of its interoperability features.
 
     This document is the **conforming API surface** for AIFP-1. The normative
     protocol specification is **AIFP-1 (Doc 01)**. Where this document and AIFP-1
@@ -23,7 +24,6 @@ info:
     ## Pricing (canonical)
     | Pricing Tier | Price (USD) |
     |---|---|
-    | standard | USD 0.00001 |
     | standard | USD 0.00001 |
     | complex | USD 0.00006 |
     | premium | USD 0.00010 |
@@ -45,7 +45,7 @@ servers:
   - url: https://api.aifinpay.io
     description: Production
   - url: https://sandbox.api.aifinpay.io
-    description: Sandbox (test mode, no real settlement)
+    description: Sandbox (planned — test mode, no real settlement)
 
 tags:
   - name: Quote
@@ -61,7 +61,7 @@ tags:
   - name: Wallet
     description: Agent wallet provisioning, funding, and budget policy.
   - name: Passport
-    description: Agent Passport identity, reputation, and trust level.
+    description: Agent Passport identity.
   - name: Migration
     description: x402 compatibility and migration helpers.
   - name: Webhooks
@@ -109,7 +109,7 @@ paths:
                     resource: /api/data
                     amount: "0.04"
                     currency: USD
-                    accepted_assets: [USDC, USDT, PYUSD]
+                    accepted_assets: [USDC, USDT, SOL, POL]
                     accepted_chains: [polygon, base, solana]
                     pay_to: { polygon: "0xMerchant...", solana: "Merc...111" }
                     nonce: b7e2...c91a
@@ -288,7 +288,7 @@ paths:
       tags: [Merchant]
       operationId: setMerchantResources
       summary: Configure resource pricing for a merchant
-      description: Map resource paths to pricing_tier tiers (standard/standard/complex/premium).
+      description: Map resource paths to pricing tiers (standard/complex/premium).
       security:
         - ApiKeyAuth: []
       parameters:
@@ -355,7 +355,7 @@ paths:
       summary: Issue an Agent Passport
       description: |
         Creates an Agent Passport (`pp_*`) bound to an agent (`agt_*`), with an
-        Ed25519 identity key, reputation (start 500), and trust level.
+        Ed25519 identity key.
       security:
         - ApiKeyAuth: []
       requestBody:
@@ -374,7 +374,7 @@ paths:
     get:
       tags: [Passport]
       operationId: getPassport
-      summary: Retrieve an Agent Passport (reputation, risk, trust)
+      summary: Retrieve an Agent Passport
       security:
         - ApiKeyAuth: []
       parameters:
@@ -494,19 +494,20 @@ components:
           example: { error: { type: rate_limited, code: AIFP-429, message: "Request limit exceeded", request_id: req_8f19, doc: "https://docs.aifinpay.io/errors/AIFP-429" } }
 
   schemas:
-    Pricing Tier:
+    PricingTier:
       type: string
-      enum: [standard, standard, complex, premium]
+      enum: [standard, complex, premium]
       description: |
-        Pricing tier. standard=USD 0.00001, standard=USD 0.00001, complex=USD 0.00006, premium=USD 0.00010.
+        Pricing tier. standard=USD 0.00001, complex=USD 0.00006, premium=USD 0.00010.
     Asset:
       type: string
-      enum: [USDC, USDT, PYUSD]
+      enum: [USDC, USDT, SOL, POL]
+      description: PYUSD support is planned.
     Chain:
       type: string
       description: |
-        One of the 12 supported networks. Full Core (8): solana, polygon, avalanche,
-        bnb, optimism, arbitrum, base, unichain. Splitter-only EVM (2): bot_chain,
+        One of the 12 supported networks. Full Core (7): solana, polygon, avalanche,
+        bnb, arbitrum, base, unichain. Splitter-only EVM (3): optimism, bot_chain,
         xrpl_evm. Splitter MVP non-EVM (2): near, aptos.
       enum: [solana, polygon, avalanche, bnb, optimism, arbitrum, base, unichain, bot_chain, xrpl_evm, near, aptos]
 
@@ -516,7 +517,7 @@ components:
       properties:
         merchant_id: { type: string, pattern: '^mrch_[A-Za-z0-9]+$' }
         resource: { type: string, example: /api/data }
-        pricing_tier: { $ref: '#/components/schemas/Pricing Tier' }
+        pricing_tier: { $ref: '#/components/schemas/PricingTier' }
         currency: { type: string, default: USD, example: USD }
     Quote:
       type: object
@@ -576,7 +577,7 @@ components:
         sub: { type: string, pattern: '^agt_[A-Za-z0-9]+$' }
         aud: { type: string, pattern: '^mrch_[A-Za-z0-9]+$' }
         resource: { type: string }
-        pricing_tier: { $ref: '#/components/schemas/Pricing Tier' }
+        pricing_tier: { $ref: '#/components/schemas/PricingTier' }
         amount: { type: string }
         currency: { type: string }
         asset: { $ref: '#/components/schemas/Asset' }
@@ -643,7 +644,7 @@ components:
         created_at: { type: string, format: date-time }
     ResourcePricingMap:
       type: object
-      additionalProperties: { $ref: '#/components/schemas/Pricing Tier' }
+      additionalProperties: { $ref: '#/components/schemas/PricingTier' }
       example: { /api/data: standard, /api/search: complex, /api/llm: premium }
 
     WalletCreateRequest:
@@ -651,14 +652,14 @@ components:
       required: [agent_id, type]
       properties:
         agent_id: { type: string, pattern: '^agt_[A-Za-z0-9]+$' }
-        type: { type: string, enum: [custodial, non_custodial], default: non_custodial }
+        type: { type: string, enum: [non_custodial], default: non_custodial, description: Strictly non-custodial — the agent holds its keys and signs locally. }
     Wallet:
       type: object
       required: [wallet_id, agent_id, type]
       properties:
         wallet_id: { type: string, pattern: '^wlt_[A-Za-z0-9]+$' }
         agent_id: { type: string }
-        type: { type: string, enum: [custodial, non_custodial] }
+        type: { type: string, enum: [non_custodial], description: Strictly non-custodial — the agent holds its keys and signs locally. }
         balances:
           type: object
           additionalProperties: { type: string }
@@ -683,14 +684,11 @@ components:
         public_key: { type: string, description: Ed25519 public key (base64url). }
     Passport:
       type: object
-      required: [passport_id, agent_id, reputation, risk, trust_level]
+      required: [passport_id, agent_id]
       properties:
         passport_id: { type: string, pattern: '^pp_[A-Za-z0-9]+$' }
         agent_id: { type: string, pattern: '^agt_[A-Za-z0-9]+$' }
         public_key: { type: string }
-        reputation: { type: integer, minimum: 0, maximum: 1000, default: 500 }
-        risk: { type: integer, minimum: 0, maximum: 100 }
-        trust_level: { type: string, enum: [untrusted, basic, verified, enterprise] }
         created_at: { type: string, format: date-time }
 
     X402MigrationRequest:

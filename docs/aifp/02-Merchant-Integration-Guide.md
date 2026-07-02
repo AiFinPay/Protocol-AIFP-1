@@ -20,7 +20,7 @@
 
 ## Copyright Notice
 
-Copyright © 2026 AiFinPay, Inc. Licensed under CC BY 4.0. Code samples are licensed Apache-2.0/MIT and may be used without attribution.
+Copyright © 2026 CoinSecurities (SECCO) Pte. Ltd., Singapore. Licensed under CC BY 4.0. Code samples are licensed Apache-2.0/MIT and may be used without attribution.
 
 ---
 
@@ -93,11 +93,11 @@ The crucial property: **the AiFinPay backend is never in your request hot path.*
 | **Receipt Token** | An EdDSA-signed JWT the agent sends on retry. You verify it locally. |
 | **Stateless verification** | Verify by signature + claims (`aud`, `resource`, `exp`, `amount`, `nonce`). No call to AiFinPay. |
 | **Nonce store** | A short-TTL set (Redis/in-memory) preventing receipt replay. TTL = receipt TTL (~600s). |
-| **Pricing Tier tier** | You tag each route `standard`/`standard`/`complex`/`premium` → price. |
+| **Pricing tier** | You tag each route `standard`/`complex`/`premium` → price. |
 | **Free quota** | First N requests per agent are free (default 100). |
 | **JWKS** | AiFinPay's public keys. Cache them; refresh on unknown `kid`. |
 
-Pricing defaults (override per route): **standard USD 0.00001 · standard USD 0.00001 · complex USD 0.00006 · premium USD 0.00010**.
+Pricing defaults (override per route): **standard USD 0.00001 · complex USD 0.00006 · premium USD 0.00010**.
 
 JWKS endpoint: `https://api.aifinpay.io/v1/.well-known/jwks.json` — **cache it** (e.g., 1h), refresh on cache-miss of a `kid`.
 
@@ -106,9 +106,9 @@ JWKS endpoint: `https://api.aifinpay.io/v1/.well-known/jwks.json` — **cache it
 # 3. The Integration Checklist
 
 ```text
-[ ] Install the AiFinPay merchant SDK (or implement verification directly).
+[ ] Implement receipt verification with a standard JWT library (jose etc.); a merchant SDK is planned.
 [ ] Set AIFP_MERCHANT_ID and AIFP_API_KEY from env.
-[ ] Configure free quota (default 100) + per-route pricing_tier tiers.
+[ ] Configure free quota (default 100) + per-route pricing_tiers.
 [ ] Wire middleware: identify → quota → challenge / verify.
 [ ] Cache JWKS; handle key rotation by kid.
 [ ] Add a nonce store (Redis) for replay protection.
@@ -122,23 +122,23 @@ JWKS endpoint: `https://api.aifinpay.io/v1/.well-known/jwks.json` — **cache it
 
 # 4. Pricing Engine & Free Quota
 
-A merchant maps a request to a **pricing_tier tier**, which maps to a **price**. The simplest engine is a static route table; advanced setups use rules (method, path, query weight, payload size) and may consult the Dynamic Pricing Engine.
+A merchant maps a request to a **pricing_tier**, which maps to a **price**. The simplest engine is a static route table; advanced setups use rules (method, path, query weight, payload size) and may consult the Dynamic Pricing Engine.
 
 ```ts
 // pricing.ts — framework-agnostic
-export type Pricing Tier = "standard" | "standard" | "complex" | "premium";
+export type PricingTier = "standard" | "complex" | "premium";
 
-const PRICE: Record<Pricing Tier, string> = {
-  standard: "0.01", standard: "0.04", complex: "0.08", premium: "0.10",
+const PRICE: Record<PricingTier, string> = {
+  standard: "0.04", complex: "0.08", premium: "0.10",
 };
 
-const ROUTE_TIER: { test: RegExp; tier: Pricing Tier }[] = [
+const ROUTE_TIER: { test: RegExp; tier: PricingTier }[] = [
   { test: /^\/api\/lookup\//, tier: "standard" },
   { test: /^\/api\/search/,   tier: "complex" },
   { test: /^\/api\/infer/,    tier: "premium" },
 ];
 
-export function tierFor(path: string): Pricing Tier {
+export function tierFor(path: string): PricingTier {
   return ROUTE_TIER.find(r => r.test.test(path))?.tier ?? "standard";
 }
 export function priceFor(path: string): string { return PRICE[tierFor(path)]; }
@@ -208,13 +208,13 @@ The Python equivalent (used by FastAPI/Django) and others mirror this exactly. E
 
 # 6. Framework Integrations
 
-> Every example: installs the SDK, configures env, adds middleware, returns a conformant `402` challenge, and verifies receipts locally. Replace `mrch_…` and keys with your own. All snippets are production-shaped (error handling, headers, nonce store).
+> Every example: installs the dependencies, configures env, adds middleware, returns a conformant `402` challenge, and verifies receipts locally. Replace `mrch_…` and keys with your own. All snippets are production-shaped (error handling, headers, nonce store).
 
 ## 6.1. Express (Node.js)
 
 **Install**
 ```bash
-npm install @aifinpay/merchant jose ioredis
+npm install jose ioredis
 ```
 
 **Middleware**
@@ -241,7 +241,7 @@ function challenge(res, resource: string) {
         quote_endpoint: "https://api.aifinpay.io/v1/quote",
         merchant_id: MERCHANT_ID, resource, pricing_tier: tierFor(resource),
         estimated_amount: priceFor(resource), currency: "USD",
-        accepted_assets: ["USDC", "USDT", "PYUSD"],
+        accepted_assets: ["USDC", "USDT", "SOL", "POL"], // PYUSD planned
         accepted_chains: ["polygon", "base", "solana"],
         nonce, expires_at: new Date(Date.now() + 300_000).toISOString(),
       },
@@ -279,7 +279,7 @@ app.listen(3000);
 ## 6.2. Fastify (Node.js)
 
 ```bash
-npm install fastify @aifinpay/merchant jose ioredis
+npm install fastify jose ioredis
 ```
 
 ```ts
@@ -331,7 +331,7 @@ app.listen({ port: 3000 });
 ## 6.3. NestJS
 
 ```bash
-npm install @nestjs/common @aifinpay/merchant jose ioredis
+npm install @nestjs/common jose ioredis
 ```
 
 ```ts
@@ -395,7 +395,7 @@ import { jwtVerify, createRemoteJWKSet } from "jose";
 
 const JWKS = createRemoteJWKSet(new URL("https://api.aifinpay.io/v1/.well-known/jwks.json"));
 const MERCHANT_ID = process.env.AIFP_MERCHANT_ID!;
-const PRICE = { standard: "0.01", standard: "0.04", complex: "0.08", premium: "0.10" } as const;
+const PRICE = { standard: "0.04", complex: "0.08", premium: "0.10" } as const;
 
 export async function middleware(req: NextRequest) {
   const resource = req.nextUrl.pathname;
@@ -442,7 +442,7 @@ import redis.asyncio as redis
 MERCHANT_ID = "mrch_9f3a1c2b"
 ISSUER = "https://api.aifinpay.io"
 JWKS_URL = "https://api.aifinpay.io/v1/.well-known/jwks.json"
-PRICE = {"standard": "0.01", "standard": "0.04", "complex": "0.08", "premium": "0.10"}
+PRICE = {"standard": "0.04", "complex": "0.08", "premium": "0.10"}
 FREE_QUOTA = 100
 r = redis.from_url("redis://localhost")
 
@@ -1093,7 +1093,7 @@ The dominant cost is your own business logic, not AIFP. The protocol adds sub-mi
 
 # 12. Glossary
 
-See AIFP-1 [Appendix A](./01-AIFP-1-RFC-Payment-Protocol-Specification.md#appendix-a-glossary) for the canonical glossary. Key merchant terms: **Payment Challenge**, **Receipt Token**, **Stateless Verification**, **Free Quota**, **Pricing Tier Tier**, **Nonce Store**, **JWKS**, **kid**, **Degraded Mode**.
+See AIFP-1 [Appendix A](./01-AIFP-1-RFC-Payment-Protocol-Specification.md#appendix-a-glossary) for the canonical glossary. Key merchant terms: **Payment Challenge**, **Receipt Token**, **Stateless Verification**, **Free Quota**, **Pricing tier**, **Nonce Store**, **JWKS**, **kid**, **Degraded Mode**.
 
 ---
 
@@ -1106,4 +1106,4 @@ See AIFP-1 [Appendix A](./01-AIFP-1-RFC-Payment-Protocol-Specification.md#append
 
 ---
 
-*End of Merchant Integration Guide. © 2026 AiFinPay, Inc. Licensed CC BY 4.0.*
+*End of Merchant Integration Guide. © 2026 CoinSecurities (SECCO) Pte. Ltd., Singapore. Licensed CC BY 4.0.*

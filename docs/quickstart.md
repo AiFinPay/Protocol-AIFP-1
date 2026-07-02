@@ -16,6 +16,8 @@ AiFinPay charges a **1% protocol fee** on every successful transaction. The rema
 
 ## Merchant
 
+> `@aifinpay/merchant` is planned — for now verify receipts with a standard JWT library (e.g. `jose`).
+
 ```bash
 npm install @aifinpay/merchant
 ```

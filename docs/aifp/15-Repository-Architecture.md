@@ -19,14 +19,14 @@ github.com/aifinpay
 │
 ├── server                   # Reference protocol server (settlement core + control plane)
 │
-├── merchant-js              # Merchant SDK — TypeScript/Node (@aifinpay/merchant)
+├── merchant-js              # Merchant SDK — TypeScript/Node (@aifinpay/merchant) (planned)
 ├── agent-js                 # Agent SDK — TypeScript/Node (@aifinpay/agent)
-├── aifinpay-python          # Agent + Merchant SDK — Python
-├── aifp-go                  # Agent + Merchant SDK — Go
-├── aifinpay-rust            # SDK — Rust (crate: aifinpay)
-├── aifinpay-java            # SDK — Java (io.aifinpay:aifp)
-├── aifinpay-php             # SDK — PHP (aifinpay/aifp)
-├── aifinpay-dotnet          # SDK — C#/.NET (AiFinPay)
+├── aifinpay-python          # Agent SDK — Python (aifinpay-agent); merchant SDK (planned)
+├── aifp-go                  # Agent + Merchant SDK — Go (planned)
+├── aifinpay-rust            # SDK — Rust (crate: aifinpay) (planned)
+├── aifinpay-java            # SDK — Java (io.aifinpay:aifp) (planned)
+├── aifinpay-php             # SDK — PHP (aifinpay/aifp) (planned)
+├── aifinpay-dotnet          # SDK — C#/.NET (AiFinPay) (planned)
 │
 ├── examples                 # Runnable examples & quickstarts (Doc 07)
 ├── docs                     # Developer portal content (docs-as-code · Doc 12)
@@ -54,20 +54,20 @@ github.com/aifinpay
 
 | Repo | Contents |
 |---|---|
-| `server` | Reference implementation: challenge/quote/pay/receipt, JWKS, settlement adapters (12 networks), hybrid fiat (BVNK), webhooks. Tracks every Final AIP. |
+| `server` | Reference implementation: challenge/quote/pay/receipt, JWKS, settlement adapters (12 networks), hybrid fiat (BVNK), webhooks. Tracks every accepted AIP. |
 
 ### Merchant SDK & Agent SDK
 
 | Repo | Package |
 |---|---|
-| `merchant-js` | `@aifinpay/merchant` (Express/Fastify/Next/etc. middleware) |
+| `merchant-js` | `@aifinpay/merchant` (Express/Fastify/Next/etc. middleware) (planned) |
 | `agent-js` | `@aifinpay/agent` |
-| `aifinpay-python` | `aifinpay-merchant`, `aifinpay-agent` |
-| `aifp-go` | `github.com/aifinpay/aifp-go` |
-| `aifinpay-rust` | crate `aifinpay` |
-| `aifinpay-java` | `io.aifinpay:aifp` |
-| `aifinpay-php` | `aifinpay/aifp` |
-| `aifinpay-dotnet` | `AiFinPay` |
+| `aifinpay-python` | `aifinpay-agent`, `aifinpay-merchant` (planned) |
+| `aifp-go` | `github.com/aifinpay/aifp-go` (planned) |
+| `aifinpay-rust` | crate `aifinpay` (planned) |
+| `aifinpay-java` | `io.aifinpay:aifp` (planned) |
+| `aifinpay-php` | `aifinpay/aifp` (planned) |
+| `aifinpay-dotnet` | `AiFinPay` (planned) |
 
 All SDK repos mirror the SDK Reference (Doc 11) and are generated/validated against `openapi` + `schemas` in CI.
 

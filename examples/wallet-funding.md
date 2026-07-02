@@ -6,7 +6,7 @@ AIFP wallets fund agent payments and enforce spending limits.
 {
   "wallet_id": "wlt_3a1b",
   "agent_id": "agt_4f9a2c7e",
-  "assets": ["USDC", "USDT", "PYUSD"],
+  "assets": ["USDC", "USDT", "POL"],
   "preferred_chain": "polygon",
   "budget": {
     "daily_usd": "5.00",
