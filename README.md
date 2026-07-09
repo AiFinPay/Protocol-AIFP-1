@@ -2,7 +2,7 @@
   <img src="assets/brand/aifp-1-protocol-hero.png" alt="AIFP-1 Protocol" width="720" />
 </p>
 
-<h1 align="center">AiFinPay Paywall Protocol</h1>
+<h1 align="center">AiFinPay AIFP-1 Protocol</h1>
 
 <p align="center">
   <strong>Payment infrastructure for autonomous AI agents, premium APIs, data products, and machine-to-machine commerce.</strong>
