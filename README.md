@@ -20,7 +20,7 @@
 
 ## The Payment Layer For The Agent Economy
 
-AiFinPay Paywall turns HTTP `402 Payment Required` into a production-grade payment handshake for AI agents. A merchant can price any API action, content object, data query, or compute job. An agent can discover the price, pay automatically within policy, receive a cryptographic receipt, and retry the original request without a human checkout screen.
+AiFinPay AIFP-1 turns HTTP `402 Payment Required` into a production-grade payment handshake for AI agents. A merchant can price any API action, content object, data query, or compute job. An agent can discover the price, pay automatically within policy, receive a cryptographic receipt, and retry the original request without a human checkout screen.
 
 ```mermaid
 flowchart LR
