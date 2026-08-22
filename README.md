@@ -29,17 +29,16 @@ request
 → settlement verifier checks the actual payment
 → receipt issued only after verification
 → agent retries the protected resource
-→ merchant verifies receipt and grants access
 ```
 
-AIFP-1 is **not the same protocol as AIFP-2/x402**. HTTP `402` is a shared HTTP primitive; protocol identity and economics must be explicit.
+AIFP-1 is separate from [AIFP-2](https://github.com/AiFinPay/AIFP-2), AiFinPay's programmable agent-payment protocol. Both may use HTTP `402`; AIFP-2 exposes an x402 v2 compatibility profile while preserving its own protocol identity and `0/0` economics.
 
 ## Current Economics
 
 | Route | Standard | Complex | Premium | AiFinPay fee | Creator/referral |
 |---|---:|---:|---:|---:|---:|
 | **AIFP-1** | `$0.0005` | `$0.002` | `$0.005` | `1%` / `100` bps | `0` bps |
-| **AIFP-2/x402** | provider-defined | provider-defined | provider-defined | `0%` | `0%` |
+| **AIFP-2 (x402-compatible)** | provider-defined | provider-defined | provider-defined | `0%` | `0%` |
 
 For AIFP-1, the displayed/quoted action price is the **gross amount paid by the agent**. The 1% AiFinPay fee is deducted from that gross amount; it is **not added on top**. The merchant receives 99% before external network or settlement costs, and the creator/referral leg is 0%.
 
@@ -58,7 +57,7 @@ Legacy `$0.00001 / $0.00006 / $0.00010` pricing, `100/1` economics, and fee-on-t
 1. A payable quote must not be issued for a route the active verifier cannot validate.
 2. A receipt must not be issued merely because a client supplied a transaction hash.
 3. The payer keeps signing local; `/v1/pay` receives the settlement reference, not the private key or recovery phrase.
-4. AIFP-1 must use gross-inclusive `100/0` economics: gross payer amount = merchant amount + 1% AiFinPay fee; AIFP-2/x402 must use `0/0`; cross-route fallback fails closed.
+4. AIFP-1 must use gross-inclusive `100/0` economics: gross payer amount = merchant amount + 1% AiFinPay fee; AIFP-2 must use `0/0`; cross-route fallback fails closed.
 5. Monetary comparisons use exact decimals/integer base units with asset-decimal awareness.
 6. Replay, duplicate settlement consumption, and idempotency conflicts fail closed.
 
@@ -111,8 +110,8 @@ Actual SDK package versions, MCP releases, backend deployment status, and paymen
 
 ## Related Protocols
 
-- **AIFP-2/x402:** separate x402-style agent-payment route; current AiFinPay protocol fee profile `0/0`.
-- **AIFP-3:** Agent Passport / identity protocol surface.
+- [**AIFP-2**](https://github.com/AiFinPay/AIFP-2): programmable agent-payment protocol with an x402 v2 compatibility profile; current AiFinPay protocol fee profile `0/0`.
+- [**AIFP-3**](https://github.com/AiFinPay/AIFP-3): Global Agent Passport for portable agent identity, authorization context, reputation, and wallet bindings.
 - **ACP:** experimental agent-to-agent messaging companion; not the AIFP-1 payment wire format.
 
 ## License
