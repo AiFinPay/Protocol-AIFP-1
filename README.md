@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/brand/aifp-1-protocol-hero.png" alt="AIFP-1 Protocol" width="720" />
+  <img src="assets/brand/aifp-1-hero-light.jpg" alt="AiFinPay AIFP-1 AI Traffic Monetization Protocol" width="900" />
 </p>
 
 <h1 align="center">AiFinPay AIFP-1 Protocol</h1>
